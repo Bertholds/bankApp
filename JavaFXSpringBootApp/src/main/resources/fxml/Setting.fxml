@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="451.0" prefWidth="745.0" style="-fx-background-color: #000;" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.SettingController">
+   <children>
+      <TabPane layoutX="55.0" layoutY="63.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab text="Menu">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="listMenus" layoutX="17.0" layoutY="39.0" prefHeight="312.0" prefWidth="150.0" />
+                        <Text fill="WHITE" layoutX="30.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menus disponible">
+                           <font>
+                              <Font size="18.0" />
+                           </font></Text>
+                        <ListView fx:id="listManager" layoutX="197.0" layoutY="39.0" prefHeight="311.0" prefWidth="156.0" />
+                        <ListView fx:id="listAdministrateur" layoutX="387.0" layoutY="41.0" prefHeight="307.0" prefWidth="156.0" />
+                        <Text fill="WHITE" layoutX="243.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Manager">
+                           <font>
+                              <Font size="18.0" />
+                           </font></Text>
+                        <Text fill="WHITE" layoutX="412.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Administrateur">
+                           <font>
+                              <Font size="18.0" />
+                           </font></Text>
+                        <Button layoutX="14.0" layoutY="363.0" mnemonicParsing="false" onAction="#handleSaveClick" prefHeight="32.0" prefWidth="156.0" text="Save configuration">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <ListView fx:id="listRoot" layoutX="573.0" layoutY="39.0" prefHeight="311.0" prefWidth="156.0" />
+                        <Text fill="WHITE" layoutX="636.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Root">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
+                        <HBox alignment="BOTTOM_LEFT" layoutX="200.0" layoutY="364.0" prefHeight="31.0" prefWidth="152.0" spacing="10.0">
+                           <children>
+                              <Button minWidth="42.0" mnemonicParsing="false" onAction="#handleManagerAdd" prefHeight="31.0" prefWidth="72.0" text="Add" />
+                              <Button mnemonicParsing="false" onAction="#handleManagerRemove" text="Remove" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" layoutX="575.0" layoutY="364.0" prefHeight="31.0" prefWidth="152.0" spacing="10.0">
+                           <children>
+                              <Button minWidth="42.0" mnemonicParsing="false" onAction="#handleRootAdd" prefHeight="31.0" prefWidth="72.0" text="Add" />
+                              <Button mnemonicParsing="false" onAction="#handleRootRemove" text="Remove" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" layoutX="392.0" layoutY="364.0" prefHeight="31.0" prefWidth="152.0" spacing="10.0">
+                           <children>
+                              <Button minWidth="42.0" mnemonicParsing="false" onAction="#handleAdministrateurAdd" prefHeight="31.0" prefWidth="72.0" text="Add" />
+                              <Button mnemonicParsing="false" onAction="#handleAdministrateurRemove" text="Remove" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Affichage Et Thème">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #000;">
+                     <children>
+                        <Pane fx:id="stylePane" layoutX="147.0" layoutY="40.0" prefHeight="138.0" prefWidth="452.0" style="-fx-background-color: GRAY;">
+                           <children>
+                              <Label fx:id="previousStyle" alignment="CENTER" layoutX="130.0" layoutY="43.0" prefHeight="53.0" prefWidth="192.0" text="CHOSE YOUR STYLE" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="36.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </Pane>
+                        <Button fx:id="btnBlueStyle" layoutX="147.0" layoutY="200.0" mnemonicParsing="false" onAction="#handleBleuStyleClick" onMouseEntered="#mouseBlueStyleEntered" onMouseExited="#mouseBlueStyleExited" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: DODGERBLUE; -fx-text-fill: white;" text="Blue style">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
+                        <Button fx:id="btnDarkStyle" layoutX="318.0" layoutY="200.0" mnemonicParsing="false" onAction="#handleDarkStyleClick" onMouseEntered="#mouseDarkStyleEntered" onMouseExited="#mouseDarkStyleExited" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: #1d1d1d; -fx-text-fill: white;" text="Dark style">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
+                        <Button fx:id="btnWhiteStyle" layoutX="480.0" layoutY="200.0" mnemonicParsing="false" onAction="#handleWhiteStyleClick" onMouseEntered="#mouseWhiteStyleEntered" onMouseExited="#mouseWhiteStyleExited" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: white; -fx-text-fill: #000;" text="White style">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
+                        <TextField fx:id="associationName" layoutX="146.0" layoutY="280.0" prefHeight="41.0" prefWidth="460.0" />
+                        <Text layoutX="312.0" layoutY="335.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change name of system management" underline="true">
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                        </Text>
+                        <Button layoutX="299.0" layoutY="357.0" mnemonicParsing="false" onAction="#handleValidateClick" prefHeight="25.0" prefWidth="174.0" text="Validate" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
