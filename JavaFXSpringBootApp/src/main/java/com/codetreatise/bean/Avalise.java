@@ -130,6 +130,5 @@ public class Avalise implements Serializable {
 	public Long getAvalise_id() {
 		return avalise_id;
 	}
-
-
+	
 }

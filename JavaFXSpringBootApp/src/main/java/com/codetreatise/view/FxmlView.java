@@ -181,6 +181,30 @@ public enum FxmlView {
 		public String getFxmlFile() {
 			return "/fxml/ManageCompteEpargne.fxml";
 		}
+	},
+	REMBOURSSEMENT {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("rembourssement.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/Rembourssement.fxml";
+		}
+	},
+	AVALISEREMBOURSSEMENTMOREDETAIL {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("avaliserembourssementmoredetail.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/AvaliseRembourssementMoreDetail.fxml";
+		}
 	};
 
 	public abstract String getTitle();

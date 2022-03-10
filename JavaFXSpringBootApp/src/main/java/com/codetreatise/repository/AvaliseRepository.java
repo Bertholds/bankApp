@@ -25,6 +25,9 @@ public interface AvaliseRepository extends JpaRepository<Avalise, Long> {
 	@Query("select a from Avalise a where a.transaction.adherent.identifiant=(:id) and a.remboursser=(:bool)")
 	public List<Avalise> findByIdAndStatut(@Param("id")Long id, @Param("bool")Boolean bool);
 	
+	@Query("select a from Avalise a where a.remboursser=(:bool)")
+	public List<Avalise> findByStatut(@Param("bool")Boolean bool);
+	
 	@Query("select a from Avalise a where a.transaction.adherent.identifiant=(:id) and a.remboursser=(:bool)")
 	public List<Avalise> findByIdAndStatutList(@Param("id")Long id, @Param("bool")Boolean bool);
 }

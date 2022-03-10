@@ -1,6 +1,8 @@
 package com.codetreatise.controller;
 
+import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +43,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -52,6 +55,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
@@ -78,7 +82,7 @@ public class TransactionController implements Initializable {
 	@FXML
 	private Button btnRetrait;
 	@FXML
-	private Button btnVirement;
+	private Button btnRembourssement;
 	@FXML
 	private TableView<Transaction> transactionTable;
 	@FXML
@@ -118,18 +122,35 @@ public class TransactionController implements Initializable {
 	private AvaliseRepository avaliseRepository;
 
 	@Autowired
-	private TransactionServiceImplement transactionServiceImplement;
-
-	@Autowired
-	private AvaliseEditDialogController dialogRemboursser;
-	@Autowired
-	private AvaliseEmprintEditDialogController dialogEmprinter;
-
-	@Autowired
 	private MethodUtilitaire methodUtilitaire;
 
 	ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
 	ObservableList<String> adherentsList = FXCollections.observableArrayList();
+
+	// Appeler depuis AvaliseEmprintEditDialogController car clearField supprime les
+	// données des textFields
+	float withDrawAmont;
+	Adherent adherentEmetteur;
+	Float laCarte;
+	CompteEpargne compteEpargneEmetteur;
+
+	public CompteEpargne getAccountEpargneEmetteur() {
+		return compteEpargneEmetteur;
+	}
+	public Float getLaCarte() {
+		return laCarte;
+	}
+
+	public Adherent getAdhEmetteur() {
+		return adherentEmetteur;
+	}
+
+	public Float getWithDrawAmont() {
+		return withDrawAmont;
+	}
+
+	// Appeler depuis AvaliseEmprintEditDialogController car clearField supprime les
+	// données des textFields
 
 	public String getOperation() {
 		return operation;
@@ -152,12 +173,13 @@ public class TransactionController implements Initializable {
 	public void handleValidateClick(ActionEvent event) throws Exception {
 		if (operation != null) {
 			switch (operation) {
-			case "virement":
-				virement();
+			case "rembourssement":
+				handleRembourssement(event);
+				//virement();
 				break;
 
-			case "retrait":
-				retrait();
+			case "pret":
+				pret();
 				break;
 
 			case "depot":
@@ -173,12 +195,12 @@ public class TransactionController implements Initializable {
 	}
 
 	// Event Listener on Button[#btnDepot].onAction
-	
+
 	@FXML
 	public void handleDepotPressed(MouseEvent event) {
 		operation = "depot";
 		btnDepot.setStyle("-fx-background-color: red;");
-		btnVirement.setStyle("-fx-background-color: #1d1d1d;");
+		btnRembourssement.setStyle("-fx-background-color: #1d1d1d;");
 		btnRetrait.setStyle("-fx-background-color: #1d1d1d;");
 		System.out.println("depot");
 		memberDestinataireId.getSelectionModel().clearSelection();
@@ -188,9 +210,9 @@ public class TransactionController implements Initializable {
 	// Event Listener on Button[#btnRetrait].onAction
 	@FXML
 	public void handleRetraitPressed(MouseEvent event) {
-		operation = "retrait";
+		operation = "pret";
 		btnRetrait.setStyle("-fx-background-color: red;");
-		btnVirement.setStyle("-fx-background-color: #1d1d1d;");
+		btnRembourssement.setStyle("-fx-background-color: #1d1d1d;");
 		btnDepot.setStyle("-fx-background-color: #1d1d1d;");
 		System.out.println("retrait");
 		memberDestinataireId.getSelectionModel().clearSelection();
@@ -199,13 +221,12 @@ public class TransactionController implements Initializable {
 
 	// Event Listener on Button[#btnVirement].onAction
 	@FXML
-	public void handleVirementPressed(MouseEvent event) {
-		operation = "virement";
-		btnVirement.setStyle("-fx-background-color: red;");
+	public void handleRembourssementPressed(MouseEvent event) {
+		operation = "rembourssement";
+		btnRembourssement.setStyle("-fx-background-color: red;");
 		btnDepot.setStyle("-fx-background-color: #1d1d1d;");
 		btnRetrait.setStyle("-fx-background-color: #1d1d1d;");
 		memberDestinataireId.setDisable(false);
-		System.out.println("virement");
 	}
 
 	// Event Listener on TextField[#search].onKeyReleased
@@ -226,10 +247,10 @@ public class TransactionController implements Initializable {
 		for (CompteEpargne compteEpargne : compteEpargnes) {
 			adherentsList.add(compteEpargne.getAdherent().getUniqueName());
 		}
-		
+
 		membeEmetteurId.setItems(adherentsList);
 		memberDestinataireId.setItems(adherentsList);
-		
+
 		FilterValueOnComboboxEmetteurId(membeEmetteurId);
 		FilterValueOnComboboxEmetteurId(memberDestinataireId);
 	}
@@ -258,14 +279,14 @@ public class TransactionController implements Initializable {
 		dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 	}
 
-	private void LoadDataOnTable() {
+	public void LoadDataOnTable() {
 
 		transactionList.clear();
 		transactionList.addAll(transactionRepository.findAll());
 		transactionTable.setItems(transactionList);
 	}
 
-	private void clearField() {
+	public void clearField() {
 		id.clear();
 		membeEmetteurId.getSelectionModel().clearSelection();
 		membeEmetteurId.getEditor().clear();
@@ -274,7 +295,7 @@ public class TransactionController implements Initializable {
 		memberDestinataireId.getEditor().clear();
 		btnDepot.setStyle("-fx-background-color: #1d1d1d");
 		btnRetrait.setStyle("-fx-background-color: #1d1d1d");
-		btnVirement.setStyle("-fx-background-color: #1d1d1d");
+		btnRembourssement.setStyle("-fx-background-color: #1d1d1d");
 	}
 
 	private void filteredTable(KeyEvent event) {
@@ -349,10 +370,12 @@ public class TransactionController implements Initializable {
 		clock.play();
 	}
 
+	//Cette methode n'est plus utiliser pour le moment car les regles de gestion ne permettent plus 
+	//des virements d'un compte épargne à un autre
 	@Transactional
 	private void virement() throws Exception {
 		// On vérifie si l'adhérent doit de l'argent
-		CompteEpargne compteEpargneEmetteur = null;
+		 compteEpargneEmetteur = null;
 		CompteEpargne compteEpargneDestinataire = null;
 		if (MethodUtilitaire.emptyValidation("Emetteur", getEmetteur() == null)
 				&& MethodUtilitaire.emptyValidation("Destinataire", getDestinataire() == null)
@@ -390,8 +413,8 @@ public class TransactionController implements Initializable {
 										+ compteEpargneDestinataire.getAdherent().getPrenom());
 						check = false;
 						operation = "any";
-						//on enleve la couleur rouge indiquant l'opération selectionné
-						btnVirement.setStyle("-fx-background-color:   #1d1d1d;");
+						// on enleve la couleur rouge indiquant l'opération selectionné
+						btnRembourssement.setStyle("-fx-background-color:   #1d1d1d;");
 						LoadDataOnTable();
 						clearField();
 						methodUtilitaire.LogFile("Opération de " + operation,
@@ -415,7 +438,6 @@ public class TransactionController implements Initializable {
 					if (compteEpargneEmetteur.getLacarte() >= Float.parseFloat(getMontant())) {
 						// do action (switch scene)
 						stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEDITDIALOG);
-						dialogRemboursser.setRequiredValue(getAdherentEmetteur(), getMontant(), operation);
 						// editbuttonclic = true;
 
 					} else {
@@ -444,8 +466,8 @@ public class TransactionController implements Initializable {
 										+ compteEpargneDestinataire.getAdherent().getPrenom());
 						check = false;
 						operation = "any";
-						//on enleve la couleur rouge indiquant l'opération selectionné
-						btnVirement.setStyle("-fx-background-color:  #1d1d1d;");
+						// on enleve la couleur rouge indiquant l'opération selectionné
+						btnRembourssement.setStyle("-fx-background-color:  #1d1d1d;");
 						LoadDataOnTable();
 						clearField();
 						methodUtilitaire.LogFile("Opération de " + operation,
@@ -460,124 +482,185 @@ public class TransactionController implements Initializable {
 		}
 
 	}
+	
+
+	@FXML
+	private void handleRembourssement(ActionEvent actionEvent) {
+		Node node = (Node) actionEvent.getSource();
+		Stage stage = (Stage) node.getScene().getWindow();
+		stage.close();
+		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.REMBOURSSEMENT);
+	}
 
 	@Transactional
-	private void retrait() throws Exception {
+	private void pret() throws Exception {
 		if (MethodUtilitaire.emptyValidation("Emetteur", getEmetteur() == null)
 				&& MethodUtilitaire.validate("Montant", getMontant(), "[0-9]+")) {
-			CompteEpargne compteEpargneEmetteur = getCompteEpargneEmetteur();
-			if (compteEpargneEmetteur.getLacarte() != 0
-					&& compteEpargneEmetteur.getLacarte() >= Float.parseFloat(getMontant())) {
-				if (MethodUtilitaire.confirmationDialog(null, "Confirmer la transaction", "Confirmer la transaction",
-						"Un montant de " + getMontant() + " sera débité dans le compte de "
-								+ compteEpargneEmetteur.getAdherent().getNom() + " "
-								+ compteEpargneEmetteur.getAdherent().getPrenom())) {
-					compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde() - Float.parseFloat(getMontant()));
-					compteEpargneEmetteur
-							.setLacarte(compteEpargneEmetteur.getLacarte() - Float.parseFloat(getMontant()));
+			 compteEpargneEmetteur = getCompteEpargneEmetteur();
+			if (compteEpargneEmetteur != null) {
 
-					Transaction transaction = new Transaction();
-					transaction.setAdherent(getAdherentEmetteur());
-					transaction.setDate(new Date());
-					transaction.setMontant(Float.parseFloat(getMontant()));
-					transaction.setType(operation);
+				// montant de retrait
+				withDrawAmont = Float.parseFloat(getMontant());
 
-					transactionRepository.save(transaction);
-					compteEpargneServiceImplement.update(compteEpargneEmetteur);
-					LoadDataOnTable();
-					clearField();
-					MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
-							"Retrait de " + getMontant() + " Effectué avec succes");
-					operation = "any";
-					//on enleve la couleur rouge indiquant l'opération selectionné
-					btnRetrait.setStyle("-fx-background-color:  #1d1d1d;");
-					methodUtilitaire.LogFile("Opération de " + operation,
-							compteEpargneEmetteur.getAdherent().getNom() + " "
-									+ compteEpargneEmetteur.getAdherent().getPrenom(),
-							MethodUtilitaire.deserializationUser());
+				if (compteEpargneEmetteur.getLacarte() != 0 && compteEpargneEmetteur.getLacarte() >= withDrawAmont) {
+
+					if (MethodUtilitaire.confirmationDialog(null, "Confirmer la transaction",
+							"Confirmer la transaction",
+							"Un montant de " + getMontant() + " sera débité dans le compte de "
+									+ compteEpargneEmetteur.getAdherent().getNom() + " "
+									+ compteEpargneEmetteur.getAdherent().getPrenom())) {
+						makeWithDraw(compteEpargneEmetteur, withDrawAmont);
+					}
+				} else {
+					if (compteEpargneEmetteur.getLacarte() == 0.0) {
+						if (MethodUtilitaire.confirmationDialog(null, "Solde bancaire insuffisant",
+								"Le solde du compte bancaire est insuffisant pour cette transaction",
+								"Vous souhaiterez un montant de " + montant.getText()
+										+ " Mais votre compte epargne ne vous permet de retirer que "
+										+ compteEpargneEmetteur.getLacarte() + "\n Voulez vous emprinter "
+										+ withDrawAmont)) {
+
+							stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEMPRINTEDITDIALOG);
+							clearField();
+						}
+					} else {
+						if (MethodUtilitaire.confirmationDialog(null, "Solde bancaire insuffisant",
+								"Le solde du compte bancaire est insuffisant pour cette transaction",
+								"Vous souhaiterez un montant de " + montant.getText()
+										+ " Mais votre compte epargne ne vous permet de retirer que "
+										+ compteEpargneEmetteur.getLacarte() + "\n Voulez vous rétirer "
+										+ compteEpargneEmetteur.getLacarte() + " avant d'emprinter "
+										+ (withDrawAmont - compteEpargneEmetteur.getLacarte()))) {
+
+							makeWithDraw(compteEpargneEmetteur, compteEpargneEmetteur.getLacarte());
+
+							clearField();
+
+							stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEMPRINTEDITDIALOG);
+
+						}
+					}
 				}
 			} else {
-				if (MethodUtilitaire.confirmationDialog(null, "Solde bancaire insuffisant",
-						"Le solde du compte bancaire est insuffisant pour cette transaction",
-						"Vous souhaiterez un montant de " + montant.getText()
-								+ " Mais votre compte epargne ne vous permet de retirer que "
-								+ compteEpargneEmetteur.getLacarte() + "\n Voulez vous emprinter de l'argent ?")) {
-					stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEMPRINTEDITDIALOG);
-					dialogRemboursser.setRequiredValue(getAdherentEmetteur(), getMontant(), operation);
-				}
+				MethodUtilitaire.errorMessageAlert("Adhérent émetteur inconnu", "Adhérent émetteur inconnu",
+						"Vérifiez que l'hortographe saisi correspond à celle présente dans la liste");
 			}
+
 		}
+	}
+
+	// Éffectue un retrait
+	private void makeWithDraw(CompteEpargne compteEpargneEmetteur, Float montant)
+			throws UnknownHostException, ClassNotFoundException, IOException {
+		compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde() - montant);
+		compteEpargneEmetteur.setLacarte(compteEpargneEmetteur.getLacarte() - montant);
+
+		Transaction transaction = new Transaction();
+		transaction.setAdherent(getAdherentEmetteur());
+		transaction.setDate(new Date());
+		transaction.setMontant(montant);
+		transaction.setType(operation);
+
+		transactionRepository.save(transaction);
+		compteEpargneServiceImplement.update(compteEpargneEmetteur);
+		LoadDataOnTable();
+		clearField();
+		MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
+				"Retrait de " + montant + " Effectué avec succes");
+		operation = "any";
+// on enleve la couleur rouge indiquant l'opération selectionné
+		btnRetrait.setStyle("-fx-background-color:  #1d1d1d;");
+		methodUtilitaire.LogFile("Opération de " + operation,
+				compteEpargneEmetteur.getAdherent().getNom() + " " + compteEpargneEmetteur.getAdherent().getPrenom(),
+				MethodUtilitaire.deserializationUser());
+
 	}
 
 	@Transactional
 	private void depot() throws Exception {
 		if (MethodUtilitaire.emptyValidation("Emetteur", getEmetteur() == null)
 				&& MethodUtilitaire.validate("Montant", getMontant(), "[0-9]+")) {
-			CompteEpargne compteEpargneEmetteur = getCompteEpargneEmetteur();
-			List<Avalise> avaliseEmetteur = avaliseRepository.findByIdAndStatut(getId(), false);
-			if (avaliseEmetteur.size() == 0) {
-				if (MethodUtilitaire.confirmationDialog(null, "Confirmer la transaction", "Confirmer la transaction",
-						"Un montant de " + getMontant() + " sera crédité dans le compte de "
-								+ compteEpargneEmetteur.getAdherent().getNom() + " "
-								+ compteEpargneEmetteur.getAdherent().getPrenom())) {
-					compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde() + Float.parseFloat(getMontant()));
-					compteEpargneEmetteur
-							.setLacarte(compteEpargneEmetteur.getLacarte() + Float.parseFloat(getMontant()));
+			 compteEpargneEmetteur = getCompteEpargneEmetteur();
 
-					Transaction transaction = new Transaction();
-					transaction.setAdherent(getAdherentEmetteur());
-					transaction.setDate(new Date());
-					transaction.setMontant(Float.parseFloat(getMontant()));
-					transaction.setType(operation);
+			if (getId() != null) {
+				List<Avalise> avaliseEmetteur = avaliseRepository.findByIdAndStatut(getId(), false);
+				if (avaliseEmetteur.size() == 0) {
+					if (MethodUtilitaire.confirmationDialog(null, "Confirmer la transaction",
+							"Confirmer la transaction",
+							"Un montant de " + getMontant() + " sera crédité dans le compte de "
+									+ compteEpargneEmetteur.getAdherent().getNom() + " "
+									+ compteEpargneEmetteur.getAdherent().getPrenom())) {
+						compteEpargneEmetteur
+								.setSolde(compteEpargneEmetteur.getSolde() + Float.parseFloat(getMontant()));
+						compteEpargneEmetteur
+								.setLacarte(compteEpargneEmetteur.getLacarte() + Float.parseFloat(getMontant()));
 
-					transactionRepository.save(transaction);
-					compteEpargneServiceImplement.update(compteEpargneEmetteur);
-					LoadDataOnTable();
-					clearField();
-					MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
-							"Dépot de " + getMontant() + " Effectué avec succes");
-					operation = "any";
-					//on enleve la couleur rouge indiquant l'opération selectionné
-					btnDepot.setStyle("-fx-background-color:  #1d1d1d;");
-					methodUtilitaire.LogFile("Opération de " + operation,
-							compteEpargneEmetteur.getAdherent().getNom() + " "
-									+ compteEpargneEmetteur.getAdherent().getPrenom(),
-							MethodUtilitaire.deserializationUser());
+						Transaction transaction = new Transaction();
+						transaction.setAdherent(getAdherentEmetteur());
+						transaction.setDate(new Date());
+						transaction.setMontant(Float.parseFloat(getMontant()));
+						transaction.setType(operation);
+
+						transactionRepository.save(transaction);
+						compteEpargneServiceImplement.update(compteEpargneEmetteur);
+						LoadDataOnTable();
+						clearField();
+						MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
+								"Dépot de " + getMontant() + " Effectué avec succes");
+						operation = "any";
+						// on enleve la couleur rouge indiquant l'opération selectionné
+						btnDepot.setStyle("-fx-background-color:  #1d1d1d;");
+						methodUtilitaire.LogFile("Opération de " + operation,
+								compteEpargneEmetteur.getAdherent().getNom() + " "
+										+ compteEpargneEmetteur.getAdherent().getPrenom(),
+								MethodUtilitaire.deserializationUser());
+					}
+				} else {
+					if (MethodUtilitaire.confirmationDialog(compteEpargneEmetteur, "Rappel emprints non soldé",
+							"Mr " + avaliseEmetteur.get(0).getTransaction().getAdherent().getNom() + " "
+									+ avaliseEmetteur.get(0).getTransaction().getAdherent().getPrenom()
+									+ " à des emprints non soldé",
+							"Voulez vous amortir vos dette avec ce dépot ?")) {
+						stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEDITDIALOG);
+						
+					} else {
+						
+						//Tant que un adhérent doit de l'argent il ne peux plus crédité son compte
+						//donc nous commentons cette fonctionnalité
+						
+						/**
+						
+						compteEpargneEmetteur
+								.setSolde(compteEpargneEmetteur.getSolde() + Float.parseFloat(getMontant()));
+						compteEpargneEmetteur
+								.setLacarte(compteEpargneEmetteur.getLacarte() + Float.parseFloat(getMontant()));
+
+						Transaction transaction = new Transaction();
+						transaction.setAdherent(getAdherentEmetteur());
+						transaction.setDate(new Date());
+						transaction.setMontant(Float.parseFloat(getMontant()));
+						transaction.setType(operation);
+
+						transactionRepository.save(transaction);
+						compteEpargneServiceImplement.update(compteEpargneEmetteur);
+						LoadDataOnTable();
+
+						MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
+								"Dépot de " + getMontant() + " Effectué avec successssssssss");
+						operation = "any";
+						// on enleve la couleur rouge indiquant l'opération selectionné
+						btnDepot.setStyle("-fx-background-color:  #1d1d1d;");
+						clearField();
+						methodUtilitaire.LogFile("Opération de " + operation,
+								compteEpargneEmetteur.getAdherent().getNom() + " "
+										+ compteEpargneEmetteur.getAdherent().getPrenom(),
+								MethodUtilitaire.deserializationUser());
+						**/
+					}
 				}
 			} else {
-				if (MethodUtilitaire.confirmationDialog(compteEpargneEmetteur, "Rappel emprints non soldé",
-						"Mr " + avaliseEmetteur.get(0).getTransaction().getAdherent().getNom() + " "
-								+ avaliseEmetteur.get(0).getTransaction().getAdherent().getPrenom()
-								+ " à des emprints non soldé",
-						"Voulez vous amortir vos dette avec ce dépot ?")) {
-					stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.AVALISEEDITDIALOG);
-					dialogEmprinter.setRequiredValue(getAdherentEmetteur(), getMontant(), operation,
-							compteEpargneEmetteur);
-				}else {
-					compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde() + Float.parseFloat(getMontant()));
-					compteEpargneEmetteur
-							.setLacarte(compteEpargneEmetteur.getLacarte() + Float.parseFloat(getMontant()));
-
-					Transaction transaction = new Transaction();
-					transaction.setAdherent(getAdherentEmetteur());
-					transaction.setDate(new Date());
-					transaction.setMontant(Float.parseFloat(getMontant()));
-					transaction.setType(operation);
-
-					transactionRepository.save(transaction);
-					compteEpargneServiceImplement.update(compteEpargneEmetteur);
-					LoadDataOnTable();
-					clearField();
-					MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
-							"Dépot de " + getMontant() + " Effectué avec successssssssss");
-					operation = "any";
-					//on enleve la couleur rouge indiquant l'opération selectionné
-					btnDepot.setStyle("-fx-background-color:  #1d1d1d;");
-					methodUtilitaire.LogFile("Opération de " + operation,
-							compteEpargneEmetteur.getAdherent().getNom() + " "
-									+ compteEpargneEmetteur.getAdherent().getPrenom(),
-							MethodUtilitaire.deserializationUser());
-				}
+				MethodUtilitaire.errorMessageAlert("Adhérent émetteur inconnu", "Adhérent émetteur inconnu",
+						"Vérifiez que l'hortographe saisi correspond à celle présente dans la liste");
 			}
 		}
 	}
@@ -587,7 +670,7 @@ public class TransactionController implements Initializable {
 	}
 
 	private String getDestinataire() {
-		return	memberDestinataireId.getSelectionModel().getSelectedItem();
+		return memberDestinataireId.getSelectionModel().getSelectedItem();
 	}
 
 	public String getMontant() {
@@ -599,15 +682,21 @@ public class TransactionController implements Initializable {
 	}
 
 	private Long getId() {
-		return getAdherentEmetteur().getIdentifiant();
+		if (getAdherentEmetteur() != null) {
+			return getAdherentEmetteur().getIdentifiant();
+		} else {
+			return null;
+		}
+
 	}
 
 	public Adherent getAdherentEmetteur() {
-		Adherent adherent = adherentRepository.findByUniqueName(getEmetteur());
-		if(adherent == null) {
-			System.out.println("############################################## adhérent null #### unique name "+getEmetteur());
+		adherentEmetteur = adherentRepository.findByUniqueName(getEmetteur());
+		if (adherentEmetteur == null) {
+			System.out.println(
+					"############################################## adhérent null #### unique name " + getEmetteur());
 		}
-		return adherent;
+		return adherentEmetteur;
 	}
 
 	private Adherent getAdherentDestinataire() {
@@ -616,8 +705,27 @@ public class TransactionController implements Initializable {
 	}
 
 	public CompteEpargne getCompteEpargneEmetteur() {
-		System.out.println("############################################## "+compteEpargneRepository.findByAdherent(getAdherentEmetteur()).getAdherent().getNom());
-		return compteEpargneRepository.findByAdherent(getAdherentEmetteur());
+
+		try {
+			//On garde ce comte dans une variable globale avant transaction car en cas d'emprint on en aura
+			//besoin dans AvaliseEmprintEditDialog
+			//si on s'en passe de cette var en pointant directement sur cette fonction, on aura une érreur 
+			//nullPointerException vu que clearField() est appeler en fin de transaction 
+			//et getAdherentEmetteur() renvera null
+			compteEpargneEmetteur = compteEpargneRepository.findByAdherent(getAdherentEmetteur());
+
+			// On recupere la carte avant la transaction; Au cas d'un emprint on pourra
+			// déterminer
+			// le montant exact de l'emprint dans AvaliseEmprintEditDialog
+			// Si on ne recupere pas avant le montant de la carte sera modifier et en cas
+			// d'emprint
+			// le montant exact de l'emprint sera faussé
+			laCarte = compteEpargneEmetteur.getLacarte();
+		} catch (Exception e) {
+			compteEpargneEmetteur = null;
+			e.printStackTrace();
+		}
+		return compteEpargneEmetteur;
 	}
 
 	@javax.transaction.Transactional

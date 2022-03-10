@@ -19,7 +19,7 @@
             <TableColumn fx:id="prenomTableColumn" prefWidth="86.0" text="Prenom" />
             <TableColumn fx:id="soldeTableColumn" prefWidth="105.0" text="Solde" />
             <TableColumn fx:id="avaliserTableColumn" prefWidth="94.0" text="Avaliser" />
-            <TableColumn fx:id="lacarteTableColumn" prefWidth="75.0" text="Jocker" />
+            <TableColumn fx:id="lacarteTableColumn" prefWidth="75.0" text="Crédibilité" />
             <TableColumn fx:id="emprinterTableColumn" prefWidth="75.0" text="Emprinter" />
             <TableColumn fx:id="actionTableColumn" prefWidth="75.0" text="Action" />
         </columns>

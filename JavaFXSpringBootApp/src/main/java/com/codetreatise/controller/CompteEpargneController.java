@@ -66,7 +66,7 @@ public class CompteEpargneController implements Initializable {
 	private Button btnFond;
 	@FXML
 	private Accordion accordionAccordAvalise;
-	
+
 	@Autowired
 	private CompteEpargneMoreDetailController dialog;
 
@@ -81,7 +81,7 @@ public class CompteEpargneController implements Initializable {
 
 	@Autowired
 	private MethodUtilitaire methodUtilitaire;
-	
+
 	@Autowired
 	@Lazy
 	private StageManager stageManager;
@@ -95,19 +95,19 @@ public class CompteEpargneController implements Initializable {
 	public void handleClearClick(ActionEvent event) {
 		clearFields();
 	}
-	
+
 	@FXML
 	public void handleShowMoreDetailClick() {
 		CompteEpargne selectedAccount = compteEpargneTable.getSelectionModel().getSelectedItem();
-		if(selectedAccount !=null) {
+		if (selectedAccount != null) {
 			stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.COMPTEEPARGNEMOREDETAIL);
 			dialog.setValue(selectedAccount);
-		}else {
+		} else {
 			MethodUtilitaire.deleteNoPersonSelectedAlert("Warning no bank account selected",
 					"Warning no bank account selected", "Please select one or many bank account and try.");
 		}
 	}
-	
+
 	@FXML
 	public void handleAdvancedClick() {
 		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.MANAGECOMPTEEPARGNE);
@@ -140,7 +140,7 @@ public class CompteEpargneController implements Initializable {
 
 	// Event Listener on Button.onAction
 	@FXML
-	public void handleDeleteClick(ActionEvent event) throws Exception{
+	public void handleDeleteClick(ActionEvent event) throws Exception {
 		CompteEpargne compteEpargne = compteEpargneTable.getSelectionModel().getSelectedItem();
 		if (compteEpargne != null) {
 			if (MethodUtilitaire.confirmationDialog(event, "Confirm to delete selected bank account ?",
@@ -160,22 +160,41 @@ public class CompteEpargneController implements Initializable {
 
 	// Event Listener on Button.onAction
 	@FXML
-	public void handleCreateClick(ActionEvent event) throws Exception{
+	public void handleCreateClick(ActionEvent event) throws Exception {
 		if (MethodUtilitaire.emptyValidation("Titulaire du compte", getAdherentNom() == null)) {
 
 			try {
-				//peut généré NullPointerExeption
+				// peut généré NullPointerExeption
 				CompteEpargne oldAccount = compteEpargneRepository.findByAdherent(getAdherent());
-				
+
 				if (oldAccount != null) {
-					MethodUtilitaire.errorMessageAlert("Warning existing account", "Warning existing account",
-							"Attention cet adhérent possède deja un compte épargne");
+					if (oldAccount.getStatut() == "Trash") {
+						if (MethodUtilitaire.confirmationDialog(oldAccount,
+								"Attention ce compte avait été suprimer définitivement",
+								"Attention le compte de" + oldAccount.getAdherent().getNom()
+										+ oldAccount.getAdherent().getPrenom() + " avait été suprimer définitivement",
+								"Voulez vous le récuperer")) {
+							oldAccount.setStatut("Actif");
+							compteEpargneServiceImplement.update(oldAccount);
+							clearFields();
+							LoadDataOnTable();
+						}
+					} else {
+						if (MethodUtilitaire.confirmationDialog(oldAccount, "Attention ce compte épargne existe déja",
+								"Ce compte épargne existe déja et est inactif",
+								"Voulez vous l'activez afin de le rendre visible ")) {			
+                           oldAccount.setStatut("Actif");
+                           compteEpargneServiceImplement.update(oldAccount);
+                           clearFields();
+       					   LoadDataOnTable();   
+						}
+					}
 				} else {
 					CompteEpargne compteEpargne = new CompteEpargne();
 					compteEpargne.setAdherent(getAdherent());
 					compteEpargne.setAvaliser(false);
 					compteEpargne.setEpargneId(getAdherent().getIdentifiant());
-					compteEpargne.setStatut("Inactif");
+					compteEpargne.setStatut("Actif");
 
 					CompteEpargne newCompteEpargne = compteEpargneRepository.save(compteEpargne);
 					MethodUtilitaire.saveAlert(newCompteEpargne, "Save compte epargne sucessful",
@@ -217,7 +236,7 @@ public class CompteEpargneController implements Initializable {
 				clearFields();
 				// setNewValues(newValue);y
 				if (newValue != null) {
-					if(newValue.getFond() == 0) {
+					if (newValue.getFond() == 0) {
 						btnFond.setDisable(false);
 					}
 				} else
@@ -313,10 +332,12 @@ public class CompteEpargneController implements Initializable {
 
 	private Adherent getAdherent() {
 		Adherent adherent = null;
-			String uniqueName = memberId.getSelectionModel().getSelectedItem();
-		//	Long id = Long.valueOf(memberId.getSelectionModel().getSelectedItem().substring(size - 1, size));
-			adherent = adherentRepository.findByUniqueName(uniqueName);
-			return adherent;
+		String uniqueName = memberId.getSelectionModel().getSelectedItem();
+		// Long id =
+		// Long.valueOf(memberId.getSelectionModel().getSelectedItem().substring(size -
+		// 1, size));
+		adherent = adherentRepository.findByUniqueName(uniqueName);
+		return adherent;
 	}
 
 	/*

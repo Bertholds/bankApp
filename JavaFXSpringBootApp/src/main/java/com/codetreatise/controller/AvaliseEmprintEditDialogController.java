@@ -116,16 +116,17 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+	
 		compteEpargneAvaliseEmprinterTable.setEditable(true);
-		setRequiredValue(t.getAdherentEmetteur(), t.getMontant(), t.getOperation(), t.getCompteEpargneEmetteur());
-		montantTransactionLabel.setText(String.valueOf((Float.parseFloat(montantString) - compteEpargneRepository.findByAdherent(adherent).getLacarte())) );
+		setRequiredValue(t.getAdhEmetteur(), String.valueOf(t.getWithDrawAmont()), t.getOperation(), t.getAccountEpargneEmetteur());
+		montantTransactionLabel.setText(String.valueOf((Float.parseFloat(montantString) - t.getLaCarte())) );
 		montantCourantLabel.getStyleClass().add("label-bright");
 		montantEmprinterTransactionLabel.setText("0.00");
 		nomLabel.setText(adherent.getNom() + " " + adherent.getPrenom());
 		montantEmprinterTransactionLabel.getStyleClass().add("label-bright");
 
 		setPropertyOnTableColumn();
-		LoadDataOnTable(Float.parseFloat(montantString));
+		LoadDataOnTable(Float.parseFloat(montantString) - compteEpargneRepository.findByAdherent(adherent).getLacarte());
 		System.out.println("initializable");
 	}
 
@@ -134,6 +135,11 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 		try {
 			compteEpargnesList.clear();
 			List<CompteEpargne> compteEpargnes = compteEpargneRepository.findByLaCarte(lacarte);
+			
+			if(compteEpargnes.contains(compteEpargneRepository.findByAdherent(adherent))) {
+				compteEpargnes.remove(compteEpargneRepository.findByAdherent(adherent));
+			}
+			
 			if (compteEpargnes.size() != 0) {
 				compteEpargnesList.addAll(compteEpargnes);
 				compteEpargneAvaliseEmprinterTable.setItems(compteEpargnesList);
@@ -155,7 +161,9 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 		this.adherent = adherent;
 		this.montantString = montant;
 		this.operation = operation;
-		this.compteEpargneEmprinteur = compteEpargneDeCeluiQuiEmprinte; 
+		this.compteEpargneEmprinteur = compteEpargneDeCeluiQuiEmprinte;
+		
+		System.out.println("montantString: " + montant);
 	}
 
 	private void setPropertyOnTableColumn() {

@@ -36,7 +36,7 @@
             <Label text="Prenom" GridPane.rowIndex="2" />
             <Label text="Lieu Naissance" GridPane.rowIndex="3" />
             <Label text="Date Naissance" GridPane.rowIndex="4" />
-            <Label text="Situation" GridPane.rowIndex="6" />
+            <Label text="Statut" GridPane.rowIndex="6" />
             <Label text="Type " GridPane.rowIndex="5" />
             <TextField fx:id="nom" prefHeight="30.0" prefWidth="337.0" promptText="Nom" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="prenom" prefHeight="30.0" prefWidth="336.0" promptText="Prenom" GridPane.columnIndex="1" GridPane.rowIndex="2" />

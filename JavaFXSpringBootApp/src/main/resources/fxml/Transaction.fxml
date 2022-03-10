@@ -39,12 +39,12 @@
                               <MaterialIconView glyphName="CALL_RECEIVED" size="20" />
                            </graphic>
                         </Button>
-                        <Button fx:id="btnRetrait" contentDisplay="RIGHT" mnemonicParsing="false" onMousePressed="#handleRetraitPressed" prefHeight="45.0" prefWidth="187.0" text="RETRAIT" GridPane.rowIndex="2">
+                        <Button fx:id="btnRetrait" contentDisplay="RIGHT" mnemonicParsing="false" onMousePressed="#handleRetraitPressed" prefHeight="45.0" prefWidth="187.0" text="PRET" GridPane.rowIndex="2">
                            <graphic>
                               <MaterialIconView glyphName="CALL_MADE" size="20" />
                            </graphic>
                         </Button>
-                        <Button id="btnVirement" fx:id="btnVirement" contentDisplay="RIGHT" mnemonicParsing="false" onMousePressed="#handleVirementPressed" prefHeight="45.0" prefWidth="187.0" text="VIREMENT">
+                        <Button id="btnVirement" fx:id="btnRembourssement" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleRembourssement" prefHeight="45.0" prefWidth="187.0" text="REMBOURSSEMENT">
                            <graphic>
                               <MaterialIconView glyphName="ARROW_FORWARD" size="20" />
                            </graphic>

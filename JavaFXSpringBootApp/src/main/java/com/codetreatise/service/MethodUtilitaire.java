@@ -57,8 +57,8 @@ public class MethodUtilitaire {
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.setContentText(content);
-		ButtonType cancel = new ButtonType("Cancel");
-		ButtonType yes = new ButtonType("Yes");
+		ButtonType cancel = new ButtonType("Annuler");
+		ButtonType yes = new ButtonType("Confirmer");
 		alert.getButtonTypes().clear();
 		alert.getButtonTypes().addAll(cancel, yes);
 		Optional<ButtonType> optional = alert.showAndWait();

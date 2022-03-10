@@ -23,7 +23,7 @@
         </rowConstraints>
          <children>
             <Label text="SOLDE DU COMPTE :" />
-            <Label text="MONTANT POSSIBLE :" GridPane.rowIndex="1" />
+            <Label text="CRÉDIBILITÉ" GridPane.rowIndex="1" />
             <Label text="COMPTE AVALISER ? :" GridPane.rowIndex="2" />
             <Label text="NET A REMBOURSSER :" GridPane.rowIndex="3" />
             <Label text="NET A PERCEVOIR :" GridPane.rowIndex="4" />
