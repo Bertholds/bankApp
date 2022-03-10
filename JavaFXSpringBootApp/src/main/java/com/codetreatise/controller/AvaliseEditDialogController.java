@@ -165,7 +165,7 @@ public class AvaliseEditDialogController implements Initializable {
 
 					// On vérifie si cest la premiere fois qu'il click car pour le rembourssement
 					// de plusieur dette avaliser on ne souhaiterai creer plusieurs transaction
-					// mais modifier juste le montant de la transaction a chaque fois
+					// mais modifier juste le montant de la transaction a chaque fois 
 
 					if (createTransaction == false) {
 						transaction = new Transaction();
