@@ -167,7 +167,7 @@ public class AvaliseEditDialogController implements Initializable {
 					// de plusieur dette avaliser on ne souhaiterai creer plusieurs transaction
 					// mais modifier juste le montant de la transaction a chaque fois 
 
-					if (createTransaction == false) {   
+					if (createTransaction == false) {    
 						transaction = new Transaction(); 
 						transaction.setAdherent(adherent);
 						transaction.setDate(new Date());
