@@ -168,7 +168,7 @@ public class AvaliseEditDialogController implements Initializable {
 					// mais modifier juste le montant de la transaction a chaque fois 
 
 					if (createTransaction == false) {
-						transaction = new Transaction();
+						transaction = new Transaction(); 
 						transaction.setAdherent(adherent);
 						transaction.setDate(new Date());
 						transaction.setMontant(Float.parseFloat(montantCourantLabel.getText()));
