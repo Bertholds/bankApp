@@ -432,7 +432,7 @@ public class HomeController implements Initializable {
 		Long actifEmprinte = (long) 0.0;
 		Long actifRestant = (long) 0.0;
 
-		for (CompteEpargne compteEpargne : compteEpargnes) {
+		for (CompteEpargne compteEpargne : compteEpargnes) { 
 
 			if (compteEpargne.getStatut() != "Trash") {
 				actifBrute += compteEpargne.getSolde();
