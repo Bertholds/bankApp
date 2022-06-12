@@ -3,6 +3,8 @@ package com.codetreatise.controller;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -17,12 +19,17 @@ import com.codetreatise.bean.Adherent;
 import com.codetreatise.bean.Avalise;
 import com.codetreatise.bean.CompteCreance;
 import com.codetreatise.bean.CompteEpargne;
+import com.codetreatise.bean.CompteEpargneDetail;
 import com.codetreatise.bean.CompteTampon;
 import com.codetreatise.bean.Transaction;
 import com.codetreatise.config.StageManager;
 import com.codetreatise.repository.AvaliseRepository;
+import com.codetreatise.repository.CompteEpargneDetailRepository;
 import com.codetreatise.repository.CompteEpargneRepository;
+import com.codetreatise.repository.CompteTamponRepository;
 import com.codetreatise.repository.TransactionRepository;
+import com.codetreatise.service.CompteDetailHelper;
+import com.codetreatise.service.DateUtil;
 import com.codetreatise.service.MethodUtilitaire;
 import com.codetreatise.service.impl.AvaliseServiceImplement;
 import com.codetreatise.service.impl.CompteCreanceServiceImplement;
@@ -65,11 +72,11 @@ public class AvaliseEditDialogController implements Initializable {
 	@FXML
 	private TableColumn<Avalise, String> prenomTableColumn;
 	@FXML
-	private TableColumn<Avalise, Float> montantTableColumn;
+	private TableColumn<Avalise, Long> montantTableColumn;
 	@FXML
-	private TableColumn<Avalise, Float> solderTableColumn;
+	private TableColumn<Avalise, Long> solderTableColumn;
 	@FXML
-	private TableColumn<Avalise, Float> resteTableColumn;
+	private TableColumn<Avalise, Long> resteTableColumn;
 	@FXML
 	private TableColumn<Avalise, Boolean> actionTableColumn;
 	// @FXML
@@ -88,7 +95,6 @@ public class AvaliseEditDialogController implements Initializable {
 	@FXML
 	private Label montantCourantLabel;
 
-	private Boolean createTransaction = false;
 	private String operation;
 
 	@Autowired
@@ -102,13 +108,16 @@ public class AvaliseEditDialogController implements Initializable {
 	private TransactionRepository transactionRepository;
 
 	@Autowired
-	private TransactionServiceImplement transactionServiceImplement;
-
-	@Autowired
 	private CompteTamponServiceImplement compteTamponServiceImplement;
 
 	@Autowired
 	private CompteEpargneRepository compteEpargneRepository;
+
+	@Autowired
+	private CompteEpargneDetailRepository compteEpargneDetailRepository;
+
+	@Autowired
+	private HomeController homeController;
 
 	@Autowired
 	private CompteEpargneServiceImplement compteEpargneServiceImplement;
@@ -132,209 +141,133 @@ public class AvaliseEditDialogController implements Initializable {
 	private CompteEpargne compteEpargneEmetteur;
 	private String montantString;
 
-	Transaction transaction = null;
-	Transaction savedTransaction = null;
-
 	ObservableList<Avalise> avaliseList = FXCollections.observableArrayList();
 
 	private void setStatutCrediteMonCompteBtn() {
 		float montantRestant = Float.parseFloat(montantTransactionRestantLabel.getText());
-		if (montantRestant == 0) {
-			crediteMonCompteBtn.setDisable(true);
-		} else if (montantRestant > 0) {
+
+		if (montantRestant > 0) {
 			crediteMonCompteBtn.setDisable(false);
+		} else {
+			crediteMonCompteBtn.setDisable(true);
 		}
+
 	}
 
 	@Transactional
 	private void validateActionClick(Avalise avalise) throws Exception {
 		// on vérifie que le formulaire est bien rempli
 		if (isInputValid(avalise)) {
-			Float dette = avalise.getMontant() - avalise.getSolder();
 
-			if (Float.parseFloat(montantCourantLabel.getText()) > dette) {
-				MethodUtilitaire.deleteNoPersonSelectedAlert("Montant Faussé",
-						"Le montant a remboursser est superieur a la dette",
-						"Le montant a remboursser est superieur a la dette; Vérifié le champ amortir");
-			} else {
-				Float current = Float.parseFloat(montantTransactionRestantLabel.getText());
-				if (Float.parseFloat(montantCourantLabel.getText()) > current) {
-					MethodUtilitaire.deleteNoPersonSelectedAlert("Attention limite atteind",
-							"Vous avaez atteind la limite du montant défini pour cette transaction", "");
+			if (MethodUtilitaire.confirmationDialog(avalise, "Valider la transaction", "Valider la transaction",
+					"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom()
+							+ " effectuera un rembourssement de: " + montantCourantLabel.getText()
+							+ "Fcfa au compte de " + avalise.getCompteEpargne().getAdherent().getNom() + " "
+							+ avalise.getCompteEpargne().getAdherent().getPrenom(),
+					"Valider", "Annuler")) {
+
+				Long dette = avalise.getMontant() - avalise.getSolder();
+
+				Transaction savedTransaction;
+
+				// Pour chaque rembourssement on creer une transaction
+				// comme sa on pourra recuperer les differentes transaction
+				// pour une instance d'avalise qui s'est réglé en plusieurs paiement
+				// grace à transaction.getAvalise()
+
+				Transaction transaction = new Transaction();
+				transaction.setAdherent(adherent);
+				transaction.setDate(new Date());
+				transaction.setMontant(Long.parseLong(montantCourantLabel.getText()));
+				transaction.setType(operation);
+				transaction.setAvalise(avalise);
+
+				if (Float.parseFloat(montantCourantLabel.getText()) == dette) {
+					avalise.setRemboursser(true);
+					avalise.setSolder(avalise.getMontant());
+					avalise.setReste((long) 0);
+					montantTransactionRestantLabel
+							.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
+									- Float.parseFloat(montantCourantLabel.getText())));
+
 				} else {
+					avalise.setRemboursser(false);
+					avalise.setSolder(avalise.getSolder() + Long.parseLong(montantCourantLabel.getText()));
+					avalise.setReste(avalise.getMontant() - avalise.getSolder());
+					montantTransactionRestantLabel
+							.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
+									- Float.parseFloat(montantCourantLabel.getText())));
 
-					// On vérifie si cest la premiere fois qu'il click car pour le rembourssement
-					// de plusieur dette avaliser on ne souhaiterai creer plusieurs transaction
-					// mais modifier juste le montant de la transaction a chaque fois 
-
-					if (createTransaction == false) {      
-						transaction = new Transaction(); 
-						transaction.setAdherent(adherent);
-						transaction.setDate(new Date());
-						transaction.setMontant(Float.parseFloat(montantCourantLabel.getText()));
-						transaction.setType(operation);
-
-						if (Float.parseFloat(montantCourantLabel.getText()) == dette) {
-							avalise.setRemboursser(true);
-							System.out.println("Dette = " + dette + " montant courant = "
-									+ Float.parseFloat(montantCourantLabel.getText()));
-							System.out.println("on est dans le if : remboursser=true");
-							avalise.setSolder(avalise.getMontant());
-							avaliseServiceImplement.update(avalise);
-							montantTransactionRestantLabel
-									.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
-											- Float.parseFloat(montantCourantLabel.getText())));
-							// LoadDataOnTable();
-						} else {
-							avalise.setRemboursser(false);
-							System.out.println("Dette = " + dette + " montant courant = "
-									+ Float.parseFloat(montantCourantLabel.getText()));
-							System.out.println("on est dans le if : remboursser=false");
-							avalise.setSolder(avalise.getSolder() + Float.parseFloat(montantCourantLabel.getText()));
-							montantTransactionRestantLabel
-									.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
-											- Float.parseFloat(montantCourantLabel.getText())));
-							// LoadDataOnTable();
-						}
-
-						if (MethodUtilitaire.confirmationDialog(transaction, "VALIDER LA TRANSACTION",
-								"VALIDER LA TRANSACTION",
-								"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom()
-										+ " effectuera un rembourssement de: " + montantCourantLabel.getText()
-										+ "Fcfa au compte de " + avalise.getCompteEpargne().getAdherent().getNom() + " "
-										+ avalise.getCompteEpargne().getAdherent().getPrenom())) {
-							savedTransaction = transactionRepository.save(transaction);
-
-							// On met a jour l'avalise et les comptes tampon et creance
-							avaliseServiceImplement.update(avalise);
-							updateCompteTampon(avalise);
-							updateCompteCreance(avalise);
-
-							// on met a jour la carte du compte epargne du remboursseur de dette
-							if (operation != "depot") {
-								CompteEpargne compteEpargneEmetteur = compteEpargneRepository
-										.findOne(avalise.getTransaction().getAdherent().getIdentifiant());
-								compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde()
-										- Float.parseFloat(montantCourantLabel.getText()));
-								compteEpargneEmetteur.setLacarte(compteEpargneEmetteur.getLacarte()
-										- Float.parseFloat(montantCourantLabel.getText()));
-								compteEpargneServiceImplement.update(compteEpargneEmetteur);
-							}
-
-							// on met egalement a jour la carte du compte epargne du benefficiare du
-							// rembourssement
-							CompteEpargne compteEpargneRecepteur = avalise.getCompteEpargne();
-							compteEpargneRecepteur.setLacarte(compteEpargneRecepteur.getLacarte()
-									+ Float.parseFloat(montantCourantLabel.getText()));
-							System.out.println("carte total :" + compteEpargneRecepteur.getLacarte());
-
-							// si ce compte epargne ne sert plus d'avalise pour de quelconque pret d'argent,
-							// on redéfinit l'attribut avaliser a faux.
-							if (compteEpargneRecepteur.getLacarte() == compteEpargneRecepteur.getSolde())
-								compteEpargneRecepteur.setAvaliser(false);
-							compteEpargneServiceImplement.update(compteEpargneRecepteur);
-
-							// permet de mettre a jour la transaction et non d'en creer une autre lors des
-							// rembourssement suivant pour le meme adherent.
-							createTransaction = true;
-							setStatutCrediteMonCompteBtn();
-							MethodUtilitaire.saveAlert(savedTransaction, "REMBOURSSEMENT EFFECTUE AVEC SUCCES",
-									"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom() + " à remboursser "
-											+ montantCourantLabel.getText() + "Fcfa");
-							montantCourantLabel.setText("");
-							LoadDataOnTable();
-							methodUtilitaire.LogFile("Opération de " + operation,
-									adherent.getNom() + " " + adherent.getPrenom() + " <<remboursse a>> "
-											+ compteEpargneRecepteur.getAdherent().getNom() + " "
-											+ compteEpargneRecepteur.getAdherent().getPrenom(),
-									MethodUtilitaire.deserializationUser());
-						} else {
-							Float montantRestant = (Float.parseFloat(montantTransactionRestantLabel.getText()) + Float.parseFloat(montantCourantLabel.getText()));
-							montantTransactionRestantLabel.setText(String.valueOf(montantRestant));
-							montantCourantLabel.setText(null);
-						}
-
-					} else {
-						transaction = savedTransaction;
-						transaction
-								.setMontant(transaction.getMontant() + Float.parseFloat(montantCourantLabel.getText()));
-						if (Float.parseFloat(montantCourantLabel.getText()) == dette) {
-							avalise.setRemboursser(true);
-							System.out.println("on est dans le else : remboursser=true");
-							avalise.setSolder(avalise.getMontant());
-							montantTransactionRestantLabel
-									.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
-											- Float.parseFloat(montantCourantLabel.getText())));
-							// LoadDataOnTable();
-						} else {
-							avalise.setRemboursser(false);
-							System.out.println("on est dans le else : remboursser=false");
-							avalise.setSolder(avalise.getSolder() + Float.parseFloat(montantCourantLabel.getText()));
-							montantTransactionRestantLabel
-									.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText())
-											- Float.parseFloat(montantCourantLabel.getText())));
-							// LoadDataOnTable();
-						}
-
-						if (MethodUtilitaire.confirmationDialog(transaction, "VALIDER LA TRANSACTION",
-								"VALIDER LA TRANSACTION",
-								"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom()
-										+ " effectuera un rembourssement de: " + montantCourantLabel.getText()
-										+ "Fcfa")) {
-
-							savedTransaction = transactionServiceImplement.update(transaction);
-
-							// On met a jour l'avalise et les comptes tampon et creance
-							avaliseServiceImplement.update(avalise);
-							updateCompteTampon(avalise);
-							updateCompteCreance(avalise);
-
-							// on met a jour la carte du compte epargne du remboursseur de dette
-							if (operation != "depot") {
-								CompteEpargne compteEpargneEmetteur = compteEpargneRepository
-										.findOne(avalise.getTransaction().getAdherent().getIdentifiant());
-								compteEpargneEmetteur.setLacarte(compteEpargneEmetteur.getLacarte()
-										- Float.parseFloat(montantCourantLabel.getText()));
-								compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde()
-										- Float.parseFloat(montantCourantLabel.getText()));
-								compteEpargneServiceImplement.update(compteEpargneEmetteur);
-							}
-
-							// on met egalement a jour la carte du compte epargne du benefficiare du
-							// rembourssement
-							CompteEpargne compteEpargneRecepteur = avalise.getCompteEpargne();
-							compteEpargneRecepteur.setLacarte(compteEpargneRecepteur.getLacarte()
-									+ Float.parseFloat(montantCourantLabel.getText()));
-							System.out.println("carte total :" + compteEpargneRecepteur.getLacarte());
-
-							// si ce compte epargne ne sert plus d'avalise pour de quelconque pret d'argent,
-							// on redéfinit l'attribut avaliser a faux.
-							if (compteEpargneRecepteur.getLacarte() == compteEpargneRecepteur.getSolde())
-								compteEpargneRecepteur.setAvaliser(false);
-
-							compteEpargneServiceImplement.update(compteEpargneRecepteur);
-
-							// permet de mettre a jour la transaction et non d'en creer une autre lors des
-							// rembourssement suivant pour le meme adherent.
-							createTransaction = true;
-							setStatutCrediteMonCompteBtn();
-							MethodUtilitaire.saveAlert(savedTransaction, "REMBOURSSEMENT EFFECTUE AVEC SUCCES",
-									"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom() + " à remboursser "
-											+ montantCourantLabel.getText() + "Fcfa");
-							montantCourantLabel.setText("");
-							LoadDataOnTable();
-							methodUtilitaire.LogFile("Opération de " + operation,
-									adherent.getNom() + " " + adherent.getPrenom() + "-->"
-											+ compteEpargneRecepteur.getAdherent().getNom() + " "
-											+ compteEpargneRecepteur.getAdherent().getPrenom(),
-									MethodUtilitaire.deserializationUser());
-						} else {
-							montantTransactionRestantLabel.setText(String.valueOf(Float.parseFloat(montantTransactionRestantLabel.getText() + Float.parseFloat(montantCourantLabel.getText()))));
-							montantCourantLabel.setText(null);
-						}
-					}
 				}
+
+				savedTransaction = transactionRepository.save(transaction);
+
+				// On met a jour l'avalise et les comptes tampon et creance
+				Avalise updatedAvalise = avaliseServiceImplement.update(avalise);
+				updateCompteTampon(avalise);
+				updateCompteCreance(avalise);
+
+				// on met a jour la carte du compte epargne du benefficiare du
+				// rembourssement
+				CompteEpargne compteEpargneRecepteur = updatedAvalise.getCompteEpargne();
+				compteEpargneRecepteur.setLacarte(
+						compteEpargneRecepteur.getLacarte() + Long.parseLong(montantCourantLabel.getText()));
+
+				// si ce compte epargne ne sert plus d'avalise pour de quelconque pret d'argent,
+				// on redéfinit l'attribut avaliser a faux.
+				if (compteEpargneRecepteur.getLacarte() == compteEpargneRecepteur.getSolde())
+					compteEpargneRecepteur.setAvaliser(false);
+				CompteEpargne savedCompteEpargne = compteEpargneServiceImplement.update(compteEpargneRecepteur);
+
+				// Compte epargneDetail
+				String date = DateUtil.format(LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+
+				// Pour celui qui recoit le rembourssement
+			
+				CompteEpargneDetail cd = CompteDetailHelper.factoryCompteEpargneDetail(savedCompteEpargne, date);
+
+				// Pour celui qui remboursse
+				CompteEpargne compteEpargneDuRemboursseur = compteEpargneRepository
+						.findByAdherent(updatedAvalise.getTransaction().getAdherent());
+				
+				CompteEpargneDetail cde = CompteDetailHelper.factoryCompteEpargneDetail(compteEpargneDuRemboursseur, date);
+
+				// si c'est le membre qui remboursse sont propre pret (il est son propre garant)
+				// Dans ce cas on fait une seule sauvegarde de l'un des deux CompteEpargneDetail
+				if (cd.getCompteEpargne().getEpargneId().equals(cde.getCompteEpargne().getEpargneId())) {
+					compteEpargneDetailRepository.save(cd);
+					System.out.println("pareil");
+				} else {
+					compteEpargneDetailRepository.save(cd);
+					compteEpargneDetailRepository.save(cde);
+					System.out.println("différent");
+				}
+
+				setStatutCrediteMonCompteBtn();
+				MethodUtilitaire.saveAlert(savedTransaction, "Rembourssement éffectué avec succèss",
+						"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom() + " à remboursser "
+								+ montantCourantLabel.getText() + "Fcfa");
+				montantCourantLabel.setText("");
+				LoadDataOnTable();
+
+				// On rafraichi la table des transactions
+				t.LoadDataOnTable();
+
+				// Met a jour les détails des actif sur la home
+				homeController.setActifDetail();
+
+				methodUtilitaire.LogFile("Opération de " + operation,
+						adherent.getNom() + " " + adherent.getPrenom() + " <<remboursse a>> "
+								+ compteEpargneRecepteur.getAdherent().getNom() + " "
+								+ compteEpargneRecepteur.getAdherent().getPrenom(),
+						MethodUtilitaire.deserializationUser(), savedTransaction.getDate());
+			} else {
+				Float montantRestant = (Float.parseFloat(montantTransactionRestantLabel.getText())
+						+ Float.parseFloat(montantCourantLabel.getText()));
+				montantTransactionRestantLabel.setText(String.valueOf(montantRestant));
+				montantCourantLabel.setText(null);
 			}
+
 		}
 	}
 
@@ -353,8 +286,8 @@ public class AvaliseEditDialogController implements Initializable {
 		this.operation = operation;
 		this.compteEpargneEmetteur = compteEpargne;
 	}
-	
-	private void setInitialValue(){
+
+	private void setInitialValue() {
 		montantTransactionLabel.setText(montantString);
 		montantTransactionRestantLabel.setText(montantString);
 		nomLabel.setText(adherent.getNom() + " " + adherent.getPrenom());
@@ -363,7 +296,7 @@ public class AvaliseEditDialogController implements Initializable {
 	private CompteTampon updateCompteTampon(Avalise avalise) {
 		CompteTampon associatedCompteTampon = avalise.getCompteTampon();
 		associatedCompteTampon
-				.setDette(associatedCompteTampon.getDette() - Float.parseFloat(montantCourantLabel.getText()));
+				.setDette(associatedCompteTampon.getDette() - Long.parseLong(montantCourantLabel.getText()));
 		CompteTampon updatedCompteTampon = compteTamponServiceImplement.update(associatedCompteTampon);
 		return updatedCompteTampon;
 	}
@@ -371,7 +304,7 @@ public class AvaliseEditDialogController implements Initializable {
 	private CompteCreance updateCompteCreance(Avalise avalise) {
 		CompteCreance associatedCompteCreance = avalise.getCompteCreance();
 		associatedCompteCreance
-				.setMontant(associatedCompteCreance.getMontant() - Float.parseFloat(montantCourantLabel.getText()));
+				.setMontant(associatedCompteCreance.getMontant() - Long.parseLong(montantCourantLabel.getText()));
 		CompteCreance updatedCompteCreance = compteCreanceServiceImplement.update(associatedCompteCreance);
 		return updatedCompteCreance;
 	}
@@ -388,7 +321,7 @@ public class AvaliseEditDialogController implements Initializable {
 
 					@Override
 					public ObservableValue<Long> call(CellDataFeatures<Avalise, Long> param) {
-						// TODO Auto-generated method stub
+
 						return new ReadOnlyObjectWrapper<Long>(
 								param.getValue().getCompteEpargne().getAdherent().getIdentifiant());
 					}
@@ -412,13 +345,12 @@ public class AvaliseEditDialogController implements Initializable {
 		montantTableColumn.setCellValueFactory(new PropertyValueFactory<>("montant"));
 		solderTableColumn.setCellValueFactory(new PropertyValueFactory<>("solder"));
 		resteTableColumn.setCellValueFactory(
-				new Callback<TableColumn.CellDataFeatures<Avalise, Float>, ObservableValue<Float>>() {
+				new Callback<TableColumn.CellDataFeatures<Avalise, Long>, ObservableValue<Long>>() {
 
 					@Override
-					public ObservableValue<Float> call(CellDataFeatures<Avalise, Float> param) {
+					public ObservableValue<Long> call(CellDataFeatures<Avalise, Long> param) {
 
-						return new ReadOnlyObjectWrapper<Float>(
-								param.getValue().getMontant() - param.getValue().getSolder());
+						return new ReadOnlyObjectWrapper<Long>(param.getValue().getReste());
 					}
 				});
 		// amortirTableColumn.setCellFactory(cellFactory2);
@@ -427,29 +359,31 @@ public class AvaliseEditDialogController implements Initializable {
 	}
 
 	@FXML
-	private void handleCrediteMonCompte(ActionEvent actionEvent) throws UnknownHostException, ClassNotFoundException, IOException {
+	private void handleCrediteMonCompte(ActionEvent actionEvent)
+			throws UnknownHostException, ClassNotFoundException, IOException {
 
-		if (MethodUtilitaire.confirmationDialog(null, "Confirmer la transaction", "Confirmer la transaction",
-				"Un montant de " + montantTransactionRestantLabel.getText() + " sera crédité dans le compte de "
-						+ adherent.getNom() + " " + adherent.getPrenom())) {
-			compteEpargneEmetteur.setSolde(compteEpargneEmetteur.getSolde() + Float.parseFloat( montantTransactionRestantLabel.getText()));
-			compteEpargneEmetteur.setLacarte(compteEpargneEmetteur.getLacarte() + Float.parseFloat( montantTransactionRestantLabel.getText()));
+		operation = "depot";
 
-			Transaction transaction = new Transaction();
-			transaction.setAdherent(adherent);
-			transaction.setDate(new Date());
-			transaction.setMontant(Float.parseFloat( montantTransactionRestantLabel.getText()));
-			transaction.setType(operation);
+		// Les différents rembourssements éffectués sur cette scene pourront dans
+		// certains cas
+		// modifier lacarte(credibilité du remboursseur) contenu dans la var
+		// compteEpargneEmetteur
+		// qui à reçu sa valeur venant de transactionController depuis la fonction
+		// setRequired()
+		// donc nous devons l'actualisé pour recuperer la nouvelle carte si elle a
+		// changer.
+		compteEpargneEmetteur = compteEpargneRepository.findOne(compteEpargneEmetteur.getAdherent().getIdentifiant());
 
-			transactionRepository.save(transaction);
-			compteEpargneServiceImplement.update(compteEpargneEmetteur);
-			t.LoadDataOnTable();
-			MethodUtilitaire.saveAlert(compteEpargneEmetteur, "Opération réussi",
-					"Dépot de " +  montantTransactionRestantLabel.getText() + " Effectué avec succes");
-			// on enleve la couleur rouge indiquant l'opération selectionné
-			methodUtilitaire.LogFile("Opération de " + operation, compteEpargneEmetteur.getAdherent().getNom() + " "
-					+ compteEpargneEmetteur.getAdherent().getPrenom(), MethodUtilitaire.deserializationUser());
+		try {
+			t.depot(compteEpargneEmetteur, Long.parseLong(montantTransactionRestantLabel.getText()), true);
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
+
+		montantTransactionRestantLabel.setText("0");
+
+		t.LoadDataOnTable();
 
 		setStatutCrediteMonCompteBtn();
 	}
@@ -488,7 +422,7 @@ public class AvaliseEditDialogController implements Initializable {
 										Float current = Float.parseFloat(montantTransactionRestantLabel.getText());
 										try {
 
-											Float dette = avalise.getMontant() - avalise.getSolder();
+											Long dette = avalise.getMontant() - avalise.getSolder();
 
 											if (Float.parseFloat(name) > dette) {
 												MethodUtilitaire.deleteNoPersonSelectedAlert("Montant Faussé",
@@ -508,7 +442,7 @@ public class AvaliseEditDialogController implements Initializable {
 												try {
 													updaterAvalise(avalise);
 												} catch (Exception e1) {
-													// TODO Auto-generated catch block
+
 													e1.printStackTrace();
 												}
 

@@ -41,7 +41,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 
 @Controller
-public class ManageAdherentController implements Initializable{
+public class ManageAdherentController implements Initializable {
 	@FXML
 	private TableView<Adherent> adherentTable;
 	@FXML
@@ -57,7 +57,7 @@ public class ManageAdherentController implements Initializable{
 	@FXML
 	private Label adherentPrenomLabel;
 	@FXML
-	private Label AdherentDateNaissLabel;
+	private Label cniLabel;
 	@FXML
 	private Label adherentLieuNaissLabel;
 	@FXML
@@ -67,8 +67,10 @@ public class ManageAdherentController implements Initializable{
 	@FXML
 	private Button activeButton;
 	@FXML
+	private Button btnDelete;
+	@FXML
 	private FontAwesomeIconView activeToggle;
-	
+
 	@Autowired
 	private AdherentsController adherentsController;
 	@Autowired
@@ -79,7 +81,12 @@ public class ManageAdherentController implements Initializable{
 	private AdherentRepository adherentRepository;
 	@Autowired
 	private AdherentServiceImpl adherentServiceImpl;
+
+	@Autowired
+	private HomeController homeController;
 	
+	URL location = SettingController.class.getProtectionDomain().getCodeSource().getLocation();
+
 	private ObservableList<Adherent> adherentList = FXCollections.observableArrayList();
 
 	// Event Listener on TextField[#adherentFiltre].onKeyReleased
@@ -92,111 +99,135 @@ public class ManageAdherentController implements Initializable{
 	@FXML
 	public void handleDeleteClick(ActionEvent event) {
 		Adherent adherent = adherentTable.getSelectionModel().getSelectedItem();
-		if(adherent != null) {
-			if(MethodUtilitaire.confirmationDialog(event, "Suppression d'un adhérent", "Vous etes sur le point de supprimer un adhérent", "L'adhérent "+ adherent.getNom()+" "+adherent.getPrenom())) {
+		if (adherent != null) {
+			if (MethodUtilitaire.confirmationDialog(event, "Suppression d'un adhérent",
+					"Vous etes sur le point de supprimer un adhérent \n sa suppression entrainera la suspenssion de son compte épargne",
+					"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom(), "Supprimer", "Annuler")) {
+				
 				adherent.setSituation("Trash");
 				adherentServiceImpl.update(adherent);
-				//rafraichissement de la table courante
+				
+				CompteEpargne compteEpargne = compteEpargneRepository.findByAdherent(adherent);
+				if(compteEpargne != null) {
+					compteEpargne.setStatut("Trash");
+					compteEpargneServiceImplement.update(compteEpargne);
+				}
+
+				clearLabel();
+
+				// rafraichissement de la table courante
 				loadDataOnTable();
-				//rafraichissement de la table sous adjascente
+				// rafraichissement de la table sous adjascente
 				adherentsController.loadDataOnTable();
 
+				homeController.initialize(location, ResourceBundle.getBundle("Bundle"));
+
 			}
-		}else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun compte sélectionné", "Aucun compte sélectionné", "Sélectionné un compte epargne dans la table et réessayer");
+		} else {
+			MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun compte sélectionné", "Aucun compte sélectionné",
+					"Sélectionné un compte epargne dans la table et réessayer");
 		}
 	}
-	
-	// Lorsque l'on supprime définitivement un adhérent, cela implique que son compte 
-	// soit désactivé. ainsi le compte désactivé, le réactivé implique que l'adhérent soit
+
+	// Lorsque l'on supprime définitivement un adhérent, cela implique que son
+	// compte
+	// soit désactivé. ainsi le compte désactivé, le réactivé implique que
+	// l'adhérent soit
 	// de nouveau créer. Un adhérent ne peux avoir qu'un seul compte.
 	@FXML
 	public void handleActiveClick(ActionEvent event) {
 		Adherent adherent = adherentTable.getSelectionModel().getSelectedItem();
 		int adherentPosition = adherentTable.getSelectionModel().getFocusedIndex();
-		if(adherent !=null) {
-			if(MethodUtilitaire.confirmationDialog(event, "Opération recursive", "Opération recursive", "L'activation ou la désactivation d'un titulaire de compte épargne entraine respectivement l'activation ou la désactivation du compte titulaire")) {
-				if(adherent.getSituation().equals("Actif")) {
+		if (adherent != null) {
+			if (MethodUtilitaire.confirmationDialog(event, "Opération recursive", "Opération recursive",
+					"L'activation ou la désactivation d'un titulaire de compte épargne entraine respectivement l'activation ou la désactivation du compte titulaire",
+					"Valider", "Annuler")) {
+				if (adherent.getSituation().equals("Actif")) {
 					activeButton.setText("OFF");
 					adherent.setSituation("Inactif");
 					adherentServiceImpl.update(adherent);
 					loadDataOnTable();
 					focusRow(adherent, adherentPosition);
-					//Désactive son compte de l'adhérent
+					// Désactive son compte de l'adhérent
 					CompteEpargne compteEpargne = compteEpargneRepository.findByAdherent(adherent);
-					if(compteEpargne != null) {
+					if (compteEpargne != null) {
 						compteEpargne.setStatut("Inactif");
 						compteEpargneServiceImplement.update(compteEpargne);
 					}
-				}else {
+				} else {
 					activeButton.setText("ON");
 					adherent.setSituation("Actif");
 					adherentServiceImpl.update(adherent);
 					loadDataOnTable();
 					focusRow(adherent, adherentPosition);
-					//Active le compte de l'adhérent
+					// Active le compte de l'adhérent
 					CompteEpargne compteEpargne = compteEpargneRepository.findByAdherent(adherent);
-					if(compteEpargne !=null) {
+					if (compteEpargne != null) {
 						compteEpargne.setStatut("Actif");
 						compteEpargneServiceImplement.update(compteEpargne);
 					}
 				}
+				
+				homeController.initialize(location, ResourceBundle.getBundle("Bundle"));
 			}
-		}else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun adhérent sélectionné", "Aucun adhérent sélectionné", "Sélectionné un adhérent dans la table et réessayer");
+		} else {
+			MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun adhérent sélectionné", "Aucun adhérent sélectionné",
+					"Sélectionné un adhérent dans la table et réessayer");
 		}
 	}
-	
+
 	private void focusRow(Adherent adherent, int position) {
-		Platform.runLater(new Runnable()
-		{
-		    @Override
-		    public void run()
-		    {
-		    	adherentTable.requestFocus();
-		    	adherentTable.getSelectionModel().select(adherent);
-		    	adherentTable.getFocusModel().focus(position);
-		    	adherentTable.scrollTo(adherent);
-		    }
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				adherentTable.requestFocus();
+				adherentTable.getSelectionModel().select(adherent);
+				adherentTable.getFocusModel().focus(position);
+				adherentTable.scrollTo(adherent);
+			}
 		});
 	}
-	
+
 	private void toggle(Adherent adherent) {
-		if(adherent !=null) {
-			if(adherent.getSituation().equals("Actif")) {
+		if (adherent != null) {
+			if (adherent.getSituation().equals("Actif")) {
 				activeToggle.setStyle("-fx-fill: green");
-			}else {
+			} else {
 				activeToggle.setStyle("-fx-fill: red");
 			}
 		}
 	}
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		btnDelete.setDisable(true);
+		activeButton.setDisable(true);
 		setColumnProperty();
 		loadDataOnTable();
-		
+
 		adherentTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Adherent>() {
 			@Override
 			public void changed(ObservableValue<? extends Adherent> observable, Adherent oldValue, Adherent newValue) {
+				btnDelete.setDisable(false);
+				activeButton.setDisable(false);
 				showPersonDetails(newValue);
 				toggle(newValue);
 			}
 		});
 	}
-	
+
 	private void setColumnProperty() {
 		aderentNomTab.setCellValueFactory(new PropertyValueFactory<>("nom"));
 		adherentPrenomTab.setCellValueFactory(new PropertyValueFactory<>("prenom"));
 	}
-	
+
 	private void loadDataOnTable() {
 		adherentList.clear();
 		adherentList.addAll(adherentRepository.findBySituation("Actif"));
 		adherentList.addAll(adherentRepository.findBySituation("Inactif"));
 		adherentTable.setItems(adherentList);
 	}
-	
+
 	private void filteredTable(KeyEvent event) {
 		FilteredList<Adherent> filteredadherent = new FilteredList<Adherent>(adherentList, e -> true);
 		adherentFiltre.setOnKeyReleased(e -> {
@@ -222,33 +253,38 @@ public class ManageAdherentController implements Initializable{
 		sortedList.comparatorProperty().bind(adherentTable.comparatorProperty());
 		adherentTable.setItems(sortedList);
 	}
-	
+
 	private void showPersonDetails(Adherent adherent) {
 		if (adherent != null) {
 			// Fill the labels with info from the person object.
 			adherentLieuNaissLabel.setText(adherent.getLieuNaiss());
 			adherentNomLael.setText(adherent.getNom());
 			adherentPrenomLabel.setText(adherent.getPrenom());
-			AdherentDateNaissLabel.setText(adherent.getDateNaiss().toString());
+			cniLabel.setText(adherent.getCni());
 			adherentFonctionLabel.setText(adherent.getFonction());
 			adherentStatutLabel.setText(adherent.getSituation());
-			if(adherent.getSituation().equals("Actif")) {
+			if (adherent.getSituation().equals("Actif")) {
 				adherentStatutLabel.setTextFill(Color.web("#00FF00"));
-			}else {
+			} else {
 				adherentStatutLabel.setTextFill(Color.RED);
 				System.out.println(adherent.getSituation());
 			}
 			adherentIdLabel.setText(adherent.getIdentifiant().toString());
 		} else {
 			// Person is null, remove all the text.
-			adherentNomLael.setText("");
-			adherentPrenomLabel.setText("");
-			AdherentDateNaissLabel.setText("");
-			adherentFonctionLabel.setText("");
-			adherentStatutLabel.setText("");
-			adherentLieuNaissLabel.setText("");
-			adherentIdLabel.setText("");
+			clearLabel();
 		}
 	}
-	
+
+	private void clearLabel() {
+		adherentNomLael.setText("");
+		adherentPrenomLabel.setText("");
+		cniLabel.setText("");
+		adherentFonctionLabel.setText("");
+		adherentStatutLabel.setText("");
+		adherentLieuNaissLabel.setText("");
+		adherentIdLabel.setText("");
+
+	}
+
 }

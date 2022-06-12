@@ -205,6 +205,90 @@ public enum FxmlView {
 		public String getFxmlFile() {
 			return "/fxml/AvaliseRembourssementMoreDetail.fxml";
 		}
+	},
+	TRANSACTIONREMBOURSSEMENTDETAIL {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("transactionrembourssementdetail.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/TransactionRembourssementDetail.fxml";
+		}
+	},
+	TRANSACTIONPRETDETAIL {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("transactionpretdetail.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/TransactionPretDetail.fxml";
+		}
+	},
+	REPORT {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("report.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/Report.fxml";
+		}
+	},
+	PROGRESSBAR {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("progressbar.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/ProgressBar.fxml";
+		}
+	},
+	REPORTCOMPTEEPARGNE {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("reportcompteepargne.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/ReportCompteEpargne.fxml";
+		}
+	},
+	BACKUP {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("backup.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/Backup.fxml";
+		}
+	},
+	REPORTTRANSACTION {
+
+		@Override
+		public String getTitle() {
+			return getStringFromResourceBundle("reporttransaction.title");
+		}
+
+		@Override
+		public String getFxmlFile() {
+			return "/fxml/ReportTransaction.fxml";
+		}
 	};
 
 	public abstract String getTitle();

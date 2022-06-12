@@ -206,3 +206,7 @@ Icons525View {
     -fx-background-color: #fff;
     -fx-background-radius: 5em;
 }
+
+.progress-indicator .percentage {
+    -fx-fill: #ffffff ;
+}

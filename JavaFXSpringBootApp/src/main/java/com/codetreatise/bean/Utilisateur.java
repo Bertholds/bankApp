@@ -33,7 +33,7 @@ public class Utilisateur implements Serializable {
 	private Long userId;
 	 
 	@OneToOne()
-	@JoinColumn(name="membreId", nullable=false)
+	@JoinColumn(name="membreId", nullable=true)
 	private Adherent adherent;
 	
 	private String pseudo;

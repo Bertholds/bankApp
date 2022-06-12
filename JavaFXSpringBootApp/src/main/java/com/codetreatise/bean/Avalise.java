@@ -28,8 +28,9 @@ public class Avalise implements Serializable {
 	private Long avalise_id;
 	
 	private boolean remboursser;
-	private Float solder;
-	private Float montant;
+	private Long solder;
+	private Long montant;
+	private Long reste;
 	
 	@OneToOne
 	private CompteEpargne compteEpargne;
@@ -54,27 +55,35 @@ public class Avalise implements Serializable {
 	/**
 	 * @return the rembourssement
 	 */
-	public Float getSolder() {
+	public Long getSolder() {
 		return solder;
 	}
 	/**
 	 * @param rembourssement the rembourssement to set
 	 */
-	public void setSolder(Float rembourssement) {
+	public void setSolder(Long rembourssement) {
 		this.solder = rembourssement;
 	}
 	
 	/**
 	 * @return the montant
 	 */
-	public Float getMontant() {
+	public Long getMontant() {
 		return montant;
 	}
 	/**
 	 * @param montant the montant to set
 	 */
-	public void setMontant(Float montant) {
+	public void setMontant(Long montant) {
 		this.montant = montant;
+	}
+	
+	
+	public Long getReste() {
+		return reste;
+	}
+	public void setReste(Long reste) {
+		this.reste = reste;
 	}
 	/**
 	 * @return the compteEpargne

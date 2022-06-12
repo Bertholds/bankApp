@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import de.jensd.fx.glyphs.materialicons.MaterialIconView?>
 <?import de.jensd.fx.glyphs.octicons.OctIconView?>
 <?import javafx.geometry.Insets?>
@@ -9,6 +8,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -73,17 +73,17 @@
                         <TextField fx:id="id" editable="false" prefHeight="45.0" prefWidth="998.0" promptText="ID Auto" GridPane.columnIndex="1" GridPane.valignment="TOP" />
                         <ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="68.0" prefWidth="265.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                           <buttons>
+                              <Button fx:id="btnClear1" mnemonicParsing="false" prefHeight="45.0" text="Undo">
+                                 <graphic>
+                                    <OctIconView glyphName="REPLY" size="20" />
+                                 </graphic>
+                              </Button>
                               <Button fx:id="btnClear" mnemonicParsing="false" onAction="#handleClearClick" prefHeight="45.0" text="Clear">
                                  <graphic>
                                     <OctIconView glyphName="GRABBER" size="20" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#handleUndoClick" prefHeight="45.0" text="Undo">
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="ROTATE_LEFT" size="20" />
-                                 </graphic>
-                              </Button>
-                              <Button fx:id="btnValidate" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleValidateClick" prefHeight="45.0" prefWidth="187.0" text="Ok">
+                              <Button fx:id="btnValidate" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleValidateClick" prefHeight="45.0" prefWidth="187.0" text="Valider">
                                  <graphic>
                                     <MaterialIconView glyphName="TOUCH_APP" size="20" />
                                  </graphic>
@@ -109,20 +109,21 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TableView fx:id="transactionTable" layoutX="-4.0" layoutY="57.0" prefHeight="495.0" prefWidth="395.0" styleClass="table-view-small-label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="-4.0" AnchorPane.topAnchor="57.0">
+                  <TextField fx:id="search" layoutX="4.0" layoutY="7.0" onKeyReleased="#handleSearchReleased" prefHeight="44.0" prefWidth="320.0" promptText="Search" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="7.0" />
+                  <Pagination fx:id="pagination" layoutX="1.0" layoutY="62.0" prefHeight="507.0" prefWidth="388.0" />
+                  <TableView fx:id="transactionTable" layoutX="-4.0" layoutY="74.0" prefHeight="440.0" prefWidth="396.0" styleClass="table-view-small-label" AnchorPane.bottomAnchor="38.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="-4.0" AnchorPane.topAnchor="74.0">
                     <columns>
                       <TableColumn fx:id="idTransactionTableColumn" prefWidth="75.0" text="Tran ID" />
-                        <TableColumn fx:id="idAdherentTableColumn" prefWidth="75.0" text="Adhé ID" />
                         <TableColumn fx:id="nomTableColumn" prefWidth="75.0" text="Nom" />
                         <TableColumn fx:id="typeTableColumn" prefWidth="75.0" text="Type" />
                         <TableColumn fx:id="montantTableColumn" prefWidth="75.0" text="Montant" />
                         <TableColumn fx:id="dateTableColumn" prefWidth="75.0" text="Date" />
+                        <TableColumn fx:id="detail" prefWidth="75.0" text="Détail" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
-                  <TextField fx:id="search" layoutX="4.0" layoutY="7.0" onKeyReleased="#handleSearchReleased" prefHeight="44.0" prefWidth="320.0" promptText="Search" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="7.0" />
                </children>
             </AnchorPane>
         </items>

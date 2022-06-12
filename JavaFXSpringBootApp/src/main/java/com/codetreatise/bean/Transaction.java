@@ -3,6 +3,7 @@ package com.codetreatise.bean;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,11 +29,15 @@ public class Transaction implements Serializable{
 	@Column(nullable=false, updatable=false, name="transactionId")
 	private Long transaction_id;
 	private String type;
-	private Float montant;
+	private Long montant;
 	private Date date;
 	
 	@OneToOne
 	private Adherent adherent;
+	
+	@Basic(optional=true)
+	@OneToOne
+	private Avalise avalise;
 
 	/**
 	 * @return the type
@@ -51,14 +56,14 @@ public class Transaction implements Serializable{
 	/**
 	 * @return the montant
 	 */
-	public Float getMontant() {
+	public Long getMontant() {
 		return montant;
 	}
 
 	/**
 	 * @param montant the montant to set
 	 */
-	public void setMontant(Float montant) {
+	public void setMontant(Long montant) {
 		this.montant = montant;
 	}
 
@@ -88,6 +93,14 @@ public class Transaction implements Serializable{
 	 */
 	public void setAdherent(Adherent adherent) {
 		this.adherent = adherent;
+	}
+	
+	public Avalise getAvalise() {
+		return avalise;
+	}
+
+	public void setAvalise(Avalise avalise) {
+		this.avalise = avalise;
 	}
 
 	/**

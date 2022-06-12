@@ -20,6 +20,6 @@ public interface AdherentRepository extends JpaRepository<Adherent, Long> {
 	@Query("select max(a.identifiant) from Adherent a")
 	public int generateId();
 	
-	Adherent findByUniqueName(String uniqueName);
+	public Adherent findByUniqueName(String uniqueName);
 	
 }

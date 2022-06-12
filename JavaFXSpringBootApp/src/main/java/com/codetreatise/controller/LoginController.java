@@ -1,11 +1,11 @@
 package com.codetreatise.controller;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,61 +34,76 @@ import javafx.scene.control.TextField;
  */
 
 @Controller
-public class LoginController implements Initializable{
+public class LoginController implements Initializable {
 
 	@FXML
-    private Button btnLogin;
+	private Button btnLogin;
 
-    @FXML
-    private PasswordField password;
+	@FXML
+	private PasswordField password;
 
-    @FXML
-    private TextField username;
+	@FXML
+	private TextField username;
 
-    @FXML
-    private Label lblLogin;
-    
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private UserAccountRepository userAccountRepository; 
-    
-    @Lazy
-    @Autowired
-    private StageManager stageManager;
-    
-    @Autowired
-    private MethodUtilitaire methodUtilitaire;
-      
-    File file;
+	@FXML
+	private Label lblLogin;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private UserAccountRepository userAccountRepository;
+
+	@Lazy
+	@Autowired
+	private StageManager stageManager; 
+
+	@Autowired
+	private MethodUtilitaire methodUtilitaire;
+
+	boolean login = true;
+
+	File file;
 	CompteUtilisateur compteUtilisateur;
-    
+
 	private void serializeUser(CompteUtilisateur compteUtilisateur) throws IOException {
-		String path = /*LoginController.class.getProtectionDomain().getCodeSource().getLocation().getPath()*/ System.getProperty("user.dir");
+		String path = /*
+						 * LoginController.class.getProtectionDomain().getCodeSource().getLocation().
+						 * getPath()
+						 */ System.getProperty("user.dir");
 		System.out.println(path);
-		file = new File(path+File.separator+"serializeUsser.txt");
-		System.out.println("Present Project Directory : "+ System.getProperty("user.dir"));
+		file = new File(path + File.separator + "other" + File.separator + "serializeUsser.txt");
+		System.out.println("Present Project Directory : " + System.getProperty("user.dir"));
 		FileOutputStream fos = new FileOutputStream(file);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(compteUtilisateur);
 		oos.close();
 		fos.close();
 	}
-	
+
 	@FXML
-    private void login(ActionEvent event) throws IOException{
-    	if(userService.authenticate(getUsername(), getPassword())){
-    		compteUtilisateur = userAccountRepository.authentification(getUsername(), getPassword());    		
-    		serializeUser(compteUtilisateur);
-			methodUtilitaire.LogFile("Operation de connection", "Pas de cible", compteUtilisateur.getUtilisateur());
-    		stageManager.switchScene(FxmlView.HOME);
-    		
-    	}else{
-    		lblLogin.setText("Login Failed.");
-    	}
-    }
-	
+	private void login(ActionEvent event) throws IOException {
+
+		if (userService.authenticate(getUsername(), getPassword())) {
+			compteUtilisateur = userAccountRepository.authentification(getUsername(), getPassword());
+			serializeUser(compteUtilisateur);
+			methodUtilitaire.LogFile("Operation de connection", "Pas de cible", compteUtilisateur.getUtilisateur(),
+					new Date(System.currentTimeMillis()));
+			stageManager.switchScene(FxmlView.HOME);
+
+		} else {
+			if (login) {
+				lblLogin.setStyle("-fx-text-fill: white");
+				lblLogin.setText("Login Failed");
+				login = false;
+			} else {
+				lblLogin.setStyle("-fx-text-fill: black");
+				lblLogin.setText("Login Failed");
+				login = true;
+			}
+		}
+	}
+
 	public String getPassword() {
 		return password.getText();
 	}
@@ -99,9 +114,9 @@ public class LoginController implements Initializable{
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+
 	}
-	
+
 	public String getAcces() {
 		return compteUtilisateur.getNiveau_access();
 	}

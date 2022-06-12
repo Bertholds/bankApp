@@ -20,6 +20,6 @@ public interface CompteEpargneRepository extends JpaRepository<CompteEpargne, Lo
 	CompteEpargne findByAdherent(Adherent adherent);
 	List<CompteEpargne> findByStatut(String statut);
 	
-	@Query("select c from CompteEpargne c where c.lacarte>=(:lacarte)")
-	ArrayList<CompteEpargne> findByLaCarte(@Param("lacarte")Float lacarte);
+	@Query("select c from CompteEpargne c where c.lacarte >= 1")
+	ArrayList<CompteEpargne> findByLaCartePositive();
 }

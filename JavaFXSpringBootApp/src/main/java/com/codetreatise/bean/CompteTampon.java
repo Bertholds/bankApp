@@ -20,7 +20,7 @@ public class CompteTampon implements Serializable {
 
 	@Id
 	private Long idTampon;
-	private Float dette;
+	private Long dette;
 	/**
 	 * @return the idTampon
 	 */
@@ -36,13 +36,13 @@ public class CompteTampon implements Serializable {
 	/**
 	 * @return the dette
 	 */
-	public Float getDette() {
+	public Long getDette() {
 		return dette;
 	}
 	/**
 	 * @param dette the dette to set
 	 */
-	public void setDette(Float dette) {
+	public void setDette(Long dette) {
 		this.dette = dette;
 	}
 	

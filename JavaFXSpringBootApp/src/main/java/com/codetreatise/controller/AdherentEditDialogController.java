@@ -43,7 +43,7 @@ public class AdherentEditDialogController implements Initializable {
 	@FXML
 	private TextField fonction;
 	@FXML
-	private DatePicker dateNaissance;
+	private TextField cni ;
 	@FXML
 	private ComboBox<String> type;
 	@FXML
@@ -59,10 +59,13 @@ public class AdherentEditDialogController implements Initializable {
 	private AdherentServiceImpl adherentServiceImpl;
 	@Autowired
 	private MethodUtilitaire methodUtilitaire;
+	
+	@Autowired
+	private HomeController homeController ;
 
 	String patern = "yyyy-MM-dd";
 	
-	ObservableList<String> typeList =  FXCollections.observableArrayList("Membre", "Cadre", "Administrateur", "Super administrateur", "Root");
+	ObservableList<String> typeList =  FXCollections.observableArrayList("Membre", "Manager", "Administrateur", "Root");
 	ObservableList<String> situationList =  FXCollections.observableArrayList("Actif", "Inactif");
 	
 	// Event Listener on Button.onAction
@@ -84,7 +87,7 @@ public class AdherentEditDialogController implements Initializable {
 		nom.setTooltip(new Tooltip("Nom de l'adhérent"));
 		prenom.setTooltip(new Tooltip("Prénom de l'adhérent"));
 		lieuNaissance.setTooltip(new Tooltip("Le lieu de naissance"));
-		dateNaissance.setTooltip(new Tooltip("Date de naissance"));
+		cni.setTooltip(new Tooltip("Numéro de la cni"));
 		type.setTooltip(new Tooltip("Le type cadre on des droit d'accès sur l'application"));
 		situation.setTooltip(new Tooltip("La situation de l'adhérent: En règle ou non"));
 		fonction.setTooltip(new Tooltip("Quel fonction joue cet adhérent au sein de l'association ?"));
@@ -105,7 +108,7 @@ public class AdherentEditDialogController implements Initializable {
 					adherent.setNom(getNom());
 					adherent.setPrenom(getPrenom());
 					adherent.setLieuNaiss(getLieuNaiss());
-					adherent.setDateNaiss(getDateNaissDateFormat(getDateNaiss())); 
+					adherent.setCni(getCni()); 
 					adherent.setSituation(getSituation());
 					adherent.setType(getType());
 					adherent.setFonction(getFonction());
@@ -117,18 +120,21 @@ public class AdherentEditDialogController implements Initializable {
 					adherentsController.loadDataOnTable();
 					methodUtilitaire.LogFile("Modification des informations d'un adhérent",
 							newAdherent.getIdentifiant() + "-" + newAdherent.getNom() + " " + newAdherent.getPrenom(),
-							MethodUtilitaire.deserializationUser());
+							MethodUtilitaire.deserializationUser(), new Date(System.currentTimeMillis()));
 				}
 				
 			} else {
 				if(existingAdherent !=null) {
 					MethodUtilitaire.deleteNoPersonSelectedAlert("Attention adhérent existant", "Attention adhérent existant", "Un adhérent porte déja ce nom veuillez choisir un autre");
 				}else {
+					
+					URL location = SettingController.class.getProtectionDomain().getCodeSource().getLocation();
+					
 					existingAdherent = new Adherent();
 					existingAdherent.setNom(getNom());
 					existingAdherent.setPrenom(getPrenom());
 					existingAdherent.setLieuNaiss(getLieuNaiss());
-					existingAdherent.setDateNaiss(getDateNaissDateFormat(getDateNaiss()));
+					existingAdherent.setCni(getCni());
 					existingAdherent.setSituation(getSituation());
 					existingAdherent.setType(getType());
 					existingAdherent.setFonction(getFonction());
@@ -137,9 +143,10 @@ public class AdherentEditDialogController implements Initializable {
 					MethodUtilitaire.saveAlert(newAdherent, "Creation de l'adhérent réussi", "l'adhérent "+newAdherent.getNom()+" "+newAdherent.getPrenom()+" à été creer avec success");
 					clearFields();
 					adherentsController.loadDataOnTable();
+					homeController.initialize(location, ResourceBundle.getBundle("Bundle"));
 					methodUtilitaire.LogFile("Enregistrement d'un adhérent",
 							newAdherent.getIdentifiant() + "-" + newAdherent.getNom() + " " + newAdherent.getPrenom(),
-							MethodUtilitaire.deserializationUser());
+							MethodUtilitaire.deserializationUser(), new Date(System.currentTimeMillis()));
 				}
 			}
 		}
@@ -158,19 +165,11 @@ public class AdherentEditDialogController implements Initializable {
 	// Event Listener on Button.onAction
 	@FXML
 	public void handleClearFieldClick(ActionEvent event) {
-		identifiant.clear();
-		nom.clear();
-		prenom.clear();
-		lieuNaissance.clear();
-		dateNaissance.getEditor().clear();
-		type.getSelectionModel().clearSelection();
-		situation.getSelectionModel().clearSelection();
-		fonction.clear();
+		clearFields();
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		DateUtil.datePickerFormat(dateNaissance);
 		setToolTip();
 		handleGenerateRegisterClick(new ActionEvent());
 		type.setItems(typeList);
@@ -194,21 +193,10 @@ public class AdherentEditDialogController implements Initializable {
 		return lieuNaissance.getText();
 	}
 
-	private String getDateNaiss() {
-		return dateNaissance.getEditor().getText();
+	private String getCni() {
+		return cni.getText();
 	}
-	private Date getDateNaissDateFormat(String dateText) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(patern);
-		Date date = null;
-		try {
-			date = dateFormat.parse(dateText);
-			return date;
-		} catch (ParseException e) {
-			
-			e.printStackTrace();
-		}
-		return date;
-	}
+	
 
 	private String getType() {
 		return type.getSelectionModel().getSelectedItem();
@@ -227,8 +215,9 @@ public class AdherentEditDialogController implements Initializable {
 			// Fill the labels with info from the person object.
 			nom.setText(adherent.getNom());
 			prenom.setText(adherent.getPrenom());
-			dateNaissance.getEditor().setText(adherent.getDateNaiss().toString());
+			cni.setText(adherent.getCni());
 			fonction.setText(adherent.getFonction());
+			type.getSelectionModel().select(adherent.getType());
 			situation.getSelectionModel().select(adherent.getSituation());
 			lieuNaissance.setText(adherent.getLieuNaiss());
 			identifiant.setText(adherent.getIdentifiant().toString());
@@ -241,7 +230,7 @@ public class AdherentEditDialogController implements Initializable {
     	nom.clear();
     	prenom.clear();
     	lieuNaissance.clear();
-    	dateNaissance.getEditor().clear();
+    	cni.clear();
     	fonction.clear();
     	type.getSelectionModel().clearSelection();
     	situation.getSelectionModel().clearSelection();
@@ -295,12 +284,8 @@ public class AdherentEditDialogController implements Initializable {
 			errorMessage += "Lieu de naissance invalide!\n";
 		}
 
-		if (getDateNaiss() == null || getDateNaiss().trim().length() == 0) {
+		if (getCni() == null || getCni().trim().length() == 0) {
 			errorMessage += "Date de naissance invalide!\n";
-		}else {
-			if(getDateNaissDateFormat(getDateNaiss()) == null) {
-				errorMessage += "Veuillez respecté ce format de date : yyyy-MM-dd ";
-			}
 		}
 
 		if (getType() == null || getType().trim().length() == 0) {

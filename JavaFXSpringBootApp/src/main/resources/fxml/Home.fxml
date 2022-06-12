@@ -7,9 +7,6 @@
 <?import de.jensd.fx.glyphs.octicons.OctIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -29,7 +26,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.HomeController">
+<VBox prefHeight="635.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.HomeController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -76,10 +73,10 @@
           <children>
             <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" minWidth="60.0" prefWidth="-1.0" style="&#10;" text="Master" textAlignment="CENTER" wrapText="false">
               <font>
-                <Font size="18.0" fx:id="x1" />
+                <Font size="18.0" />
               </font>
               <textFill>
-                <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
+                <Color blue="0.624" green="0.624" red="0.624" />
               </textFill>
             </Label>
                   <GridPane hgap="30.0" layoutX="14.0" layoutY="102.0" prefHeight="201.0" prefWidth="217.0" vgap="10.0" AnchorPane.topAnchor="102.0">
@@ -94,10 +91,10 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <MenuButton fx:id="btnAdherent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBtnAdherentClick" popupSide="RIGHT" prefHeight="43.0" prefWidth="189.0" text="Adhérents" GridPane.columnIndex="1">
+                        <MenuButton fx:id="btnAdherent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" popupSide="RIGHT" prefHeight="43.0" prefWidth="189.0" text="Adhérents" GridPane.columnIndex="1">
                           <items>
                             <MenuItem fx:id="menuItemAddAdherent" mnemonicParsing="false" onAction="#handleMenuItemAddAdherent" style="-fx-backgroun-color: blue;" text="Ajouter un adhérent" />
-                            <MenuItem fx:id="menuItemPlusOptionAdherent" mnemonicParsing="false" onAction="#handleMenuItemPlusOptionAdherent" text="Plus d'option" />
+                            <MenuItem fx:id="menuItemPlusOptionAdherent" mnemonicParsing="false" onAction="#handleMenuItemPlusOptionAdherent" text="Tous les adhérents" />
                           </items>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -106,10 +103,10 @@
                               <Insets left="25.0" />
                            </GridPane.margin>
                         </MenuButton>
-                        <MenuButton fx:id="btnCompte" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBtnCompteClick" popupSide="RIGHT" prefHeight="43.0" prefWidth="210.0" styleClass="menu-bouton" text="Comptes bancaire" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <MenuButton fx:id="btnCompte" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" popupSide="RIGHT" prefHeight="43.0" prefWidth="210.0" styleClass="menu-bouton" text="Comptes bancaire" GridPane.columnIndex="1" GridPane.rowIndex="1">
                           <items>
                             <MenuItem fx:id="menuItemAjouterCompte" mnemonicParsing="false" onAction="#handlemenuItemRapportCompte" text="Rapport " />
-                            <MenuItem fx:id="menuItemPlusOptionCompte" mnemonicParsing="false" onAction="#handleMenuItemPlusOptionCompte" text="Plus d'option" />
+                            <MenuItem fx:id="menuItemPlusOptionCompte" mnemonicParsing="false" onAction="#handleMenuItemPlusOptionCompte" text="Gérer les comptes" />
                           </items>
                            <GridPane.margin>
                               <Insets left="25.0" />
@@ -118,7 +115,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </MenuButton>
-                        <MenuButton fx:id="btnTransaction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBtnTransactionClick" popupSide="RIGHT" prefHeight="43.0" prefWidth="211.0" styleClass="menu-bouton" text="Transactions" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <MenuButton fx:id="btnTransaction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" popupSide="RIGHT" prefHeight="43.0" prefWidth="211.0" styleClass="menu-bouton" text="Transactions" GridPane.columnIndex="1" GridPane.rowIndex="2">
                           <items>
                             <MenuItem fx:id="menuItemAjouterTransaction" mnemonicParsing="false" onAction="#handleMenuItemAjouterTransaction" text="Initialiser une transaction" />
                             <MenuItem fx:id="menuItemRapportTransactions" mnemonicParsing="false" onAction="#handleMenuItemRapportsTransactions" text="Rapports de transactions" />
@@ -130,7 +127,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </MenuButton>
-                        <MenuButton fx:id="btnRapport" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBtnRapportClick" popupSide="RIGHT" prefHeight="43.0" prefWidth="211.0" styleClass="menu-bouton" text="Rapports" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <MenuButton fx:id="btnRapport" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" popupSide="RIGHT" prefHeight="43.0" prefWidth="211.0" styleClass="menu-bouton" text="Rapports" GridPane.columnIndex="1" GridPane.rowIndex="3">
                           <items>
                             <MenuItem fx:id="menuItemRapportMensuel" mnemonicParsing="false" onAction="#handleMenuItemRapportMensuel" text="Mensuel" />
                             <MenuItem fx:id="menuItemRapportTrimestriel" mnemonicParsing="false" onAction="#handleMenuItemRapportTrimestriel" text="Trimestriel" />
@@ -264,7 +261,7 @@
                <content>
             <AnchorPane id="Content" fx:id="mainView" minHeight="-1.0" minWidth="-1.0">
               <children>
-                <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="-6.0" prefHeight="42.0" prefWidth="5.0" style="&#10;" text="View" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                <Label alignment="CENTER" layoutX="14.0" layoutY="-6.0" prefHeight="42.0" prefWidth="5.0" style="&#10;" text="View" textAlignment="CENTER" wrapText="false" />
                         <Label alignment="CENTER" contentDisplay="CENTER" layoutX="117.0" layoutY="91.0" text="BANQUE" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                            <font>
                               <Font name="System Bold" size="110.0" />
@@ -291,101 +288,108 @@
             </ScrollPane>
         <AnchorPane maxWidth="-Infinity" prefHeight="551.0" prefWidth="280.0" styleClass="background-detail-block" stylesheets="@../styles/home.css">
           <children>
-            <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" styleClass="label-header" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" AnchorPane.leftAnchor="14.0" />
-                  <GridPane layoutX="10.0" layoutY="86.0" prefHeight="119.0" prefWidth="271.0" AnchorPane.topAnchor="86.0">
+            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" style="&#10;" styleClass="label-header" text="Details" textAlignment="CENTER" wrapText="false" AnchorPane.leftAnchor="14.0" />
+                  <GridPane layoutX="10.0" layoutY="88.0" prefHeight="234.0" prefWidth="271.0" AnchorPane.topAnchor="88.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="165.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="121.0" minWidth="10.0" prefWidth="121.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="182.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="121.0" minWidth="10.0" prefWidth="89.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="56.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="71.0" minHeight="0.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="64.0" minHeight="10.0" prefHeight="49.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="ADHERENTS">
+                        <Label text="ADHERENTS" GridPane.rowIndex="1">
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>
                         </Label>
-                        <Label text="EN REGLE" GridPane.rowIndex="1">
+                        <Label text="Actif" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelTotalAdherent" styleClass="label-bright" text="Label" GridPane.columnIndex="1">
+                        <Label fx:id="labelTotalAdherent" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelAdherentEnRegle" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="labelAdherentActif" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label text="NON EN REGLE" GridPane.rowIndex="2">
+                        <Label text="Inactif" GridPane.rowIndex="3">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelAdherentNonEnRegle" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="labelAdherentInactif" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
+                        <Label text="Supprimer définitivement" GridPane.rowIndex="4">
+                           <GridPane.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label fx:id="labelAdherentSupprimer" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <GridPane.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label style="-fx-font-size: 20; -fx-text-fill: yellow;" text="Détail des membres" />
                      </children>
                   </GridPane>
-                  <GridPane layoutX="7.0" layoutY="223.0" prefHeight="119.0" prefWidth="277.0">
+                  <GridPane layoutX="7.0" layoutY="338.0" prefHeight="212.0" prefWidth="277.0">
                      <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="178.0" minWidth="10.0" prefWidth="162.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="129.0" minWidth="10.0" prefWidth="124.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="139.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="138.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="58.0" minHeight="10.0" prefHeight="58.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <Label text="ACTIFS BRUTE">
+                        <Label text="ACTIFS BRUTE" GridPane.rowIndex="1">
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>
                         </Label>
-                        <Label text="ACTIFS EMPRINTES" GridPane.rowIndex="1">
+                        <Label text="ACTIFS EMPRINTES" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelActifBrute" styleClass="label-bright" text="Label" GridPane.columnIndex="1">
+                        <Label fx:id="labelActifBrute" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelActifEmprinte" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="labelActifEmprinte" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label text="ACTIFS RESTANTS" GridPane.rowIndex="2">
+                        <Label text="ACTIFS RESTANTS" GridPane.rowIndex="3">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
-                        <Label fx:id="labelActifsRestant" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="labelActifsRestant" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <GridPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </GridPane.margin>
                         </Label>
+                        <Label style="-fx-font-size: 18; -fx-text-fill: yellow;" text="Détail des actifs" />
                      </children>
                   </GridPane>
-                  <BarChart fx:id="barchartTransaction" layoutX="-7.0" layoutY="378.0" prefHeight="168.0" prefWidth="294.0" title="03 DERNIERES TRANSACTIONS">
-                    <xAxis>
-                      <CategoryAxis side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" />
-                    </yAxis>
-                  </BarChart>
           </children>
         </AnchorPane>
       </items>
@@ -394,14 +398,14 @@
       <children>
         <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
           <font>
-            <Font size="11.0" fx:id="x3" />
+            <Font size="11.0" />
           </font>
           <textFill>
-            <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+            <Color blue="0.625" green="0.625" red="0.625" />
           </textFill>
         </Label>
         <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-        <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
+        <Label maxWidth="-1.0" text="Right status" HBox.hgrow="NEVER" />
       </children>
       <padding>
         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />

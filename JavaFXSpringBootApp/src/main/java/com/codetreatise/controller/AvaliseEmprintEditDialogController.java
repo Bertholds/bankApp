@@ -1,6 +1,8 @@
 package com.codetreatise.controller;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -14,13 +16,15 @@ import com.codetreatise.bean.Adherent;
 import com.codetreatise.bean.Avalise;
 import com.codetreatise.bean.CompteCreance;
 import com.codetreatise.bean.CompteEpargne;
+import com.codetreatise.bean.CompteEpargneDetail;
 import com.codetreatise.bean.CompteTampon;
 import com.codetreatise.bean.Transaction;
 import com.codetreatise.repository.AvaliseRepository;
-import com.codetreatise.repository.CompteCreanceRepository;
+import com.codetreatise.repository.CompteEpargneDetailRepository;
 import com.codetreatise.repository.CompteEpargneRepository;
-import com.codetreatise.repository.CompteTamponRepository;
 import com.codetreatise.repository.TransactionRepository;
+import com.codetreatise.service.CompteDetailHelper;
+import com.codetreatise.service.DateUtil;
 import com.codetreatise.service.MethodUtilitaire;
 import com.codetreatise.service.impl.CompteCreanceServiceImplement;
 import com.codetreatise.service.impl.CompteEpargneServiceImplement;
@@ -75,6 +79,8 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 	@FXML
 	private Label montantCourantLabel;
 	@FXML
+	private Label garantLabel;
+	@FXML
 	private TextField idDestinataire;
 
 	private Adherent adherent;
@@ -92,16 +98,10 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 	private CompteEpargneServiceImplement compteEpargneServiceImplement;
 
 	@Autowired
-	private CompteTamponRepository compteTamponRepository;
-
-	@Autowired
 	private CompteTamponServiceImplement compteTamponServiceImplement;
 
 	@Autowired
 	private CompteCreanceServiceImplement compteCreanceServiceImplement;
-
-	@Autowired
-	private CompteCreanceRepository compteCreanceRepository;
 
 	@Autowired
 	private TransactionRepository transactionRepository;
@@ -110,59 +110,61 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 	private AvaliseRepository avaliseRepository;
 	
 	@Autowired
+	private CompteEpargneDetailRepository compteEpargneDetailRepository;
+
+	@Autowired
 	private MethodUtilitaire methodUtilitaire;
+	@Autowired
+	private HomeController homeController;
 
 	ObservableList<CompteEpargne> compteEpargnesList = FXCollections.observableArrayList();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-	
+
 		compteEpargneAvaliseEmprinterTable.setEditable(true);
-		setRequiredValue(t.getAdhEmetteur(), String.valueOf(t.getWithDrawAmont()), t.getOperation(), t.getAccountEpargneEmetteur());
-		montantTransactionLabel.setText(String.valueOf((Float.parseFloat(montantString) - t.getLaCarte())) );
+		setRequiredValue(t.getAdhEmetteur(), String.valueOf(t.getWithDrawAmontAfterCutLaCarte()), t.getOperation(),
+				t.getAccountEpargneEmetteur());
+		montantTransactionLabel.setText(String.valueOf((Float.parseFloat(montantString))));
 		montantCourantLabel.getStyleClass().add("label-bright");
 		montantEmprinterTransactionLabel.setText("0.00");
 		nomLabel.setText(adherent.getNom() + " " + adherent.getPrenom());
 		montantEmprinterTransactionLabel.getStyleClass().add("label-bright");
 
 		setPropertyOnTableColumn();
-		LoadDataOnTable(Float.parseFloat(montantString) - compteEpargneRepository.findByAdherent(adherent).getLacarte());
+		LoadDataOnTable();
 		System.out.println("initializable");
 	}
 
-	private void LoadDataOnTable(Float lacarte) {
+	private void LoadDataOnTable() {
 
 		try {
 			compteEpargnesList.clear();
-			List<CompteEpargne> compteEpargnes = compteEpargneRepository.findByLaCarte(lacarte);
-			
-			if(compteEpargnes.contains(compteEpargneRepository.findByAdherent(adherent))) {
-				compteEpargnes.remove(compteEpargneRepository.findByAdherent(adherent));
-			}
-			
+			List<CompteEpargne> compteEpargnes = compteEpargneRepository.findByLaCartePositive();
+
 			if (compteEpargnes.size() != 0) {
 				compteEpargnesList.addAll(compteEpargnes);
 				compteEpargneAvaliseEmprinterTable.setItems(compteEpargnesList);
 				System.out.println("compteEpargnes !=0 oui");
 			} else {
-				MethodUtilitaire.deleteNoPersonSelectedAlert(
-						"ATTENTION AUCUN COMPTE EPARGNE NE SATISFAIT LES CONDITION",
-						"ATTENTION AUCUN COMPTE EPARGNE NE SATISFAIT LES CONDITION", "");
+				MethodUtilitaire.deleteNoPersonSelectedAlert("Attention montant indisponible",
+						"Attention montant indisponible", "Aucun compte épargne ne dispose de ce montant");
 				System.out.println("compteEpargnes = 0 oui");
 			}
 		} catch (Exception e) {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("ATTENTION AUCUN COMPTE EPARGNE NE SATISFAIT LES CONDITION",
-					"ATTENTION AUCUN COMPTE EPARGNE NE SATISFAIT LES CONDITION", "");
+			MethodUtilitaire.deleteNoPersonSelectedAlert("Attention montant indisponible",
+					"Attention montant indisponible", "Aucun compte épargne ne dispose de ce montant");
 			e.printStackTrace();
 		}
 	}
 
-	public void setRequiredValue(Adherent adherent, String montant, String operation, CompteEpargne compteEpargneDeCeluiQuiEmprinte) {
+	public void setRequiredValue(Adherent adherent, String montant, String operation,
+			CompteEpargne compteEpargneDeCeluiQuiEmprinte) {
 		this.adherent = adherent;
 		this.montantString = montant;
 		this.operation = operation;
 		this.compteEpargneEmprinteur = compteEpargneDeCeluiQuiEmprinte;
-		
+
 		System.out.println("montantString: " + montant);
 	}
 
@@ -192,99 +194,111 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 	}
 
 	@Transactional
-	private void validateActionClick(CompteEpargne compteEpargne, CompteEpargne compteEpargneDeCeluiQuiEmprinte ) throws Exception{
+	private void validateActionClick(CompteEpargne compteEpargne, CompteEpargne compteEpargneDeCeluiQuiEmprinte)
+			throws Exception {
 
 		// On check si la textField du montant a emprinter est bien rempli
 		if (isInputValid()) {
 			System.out.println("montant a emprinter disponible " + Float.parseFloat(montantTransactionLabel.getText()));
-			System.out.println("Emprinter montant emprinter montant   " +montantEmprinterTransactionLabel.getText());
+			System.out.println("Emprinter montant emprinter montant   " + montantEmprinterTransactionLabel.getText());
 
-			if (Float.parseFloat(montantCourantLabel.getText()) >  (Float.parseFloat(montantTransactionLabel.getText())  - Float.parseFloat(montantEmprinterTransactionLabel.getText()))) {
+			if (Float.parseFloat(montantCourantLabel.getText()) > (Float.parseFloat(montantTransactionLabel.getText())
+					- Float.parseFloat(montantEmprinterTransactionLabel.getText()))) {
 				MethodUtilitaire.deleteNoPersonSelectedAlert(
-						"ATTENTION LE MONTANT A EMPRINTE EST SUPERIEUR AU MONTANT INITIAL",
+						"Attention le montant à emprinter est superieur au montant initial",
 						"Attention le montant à emprinté ne doit pas etre supérieur au montant initial",
 						"Vous avez déja emprinté: " + Float.parseFloat(montantEmprinterTransactionLabel.getText())
-								+ "FCFA et il ne vous reste plus que: " + (Float.parseFloat(montantTransactionLabel.getText()) - Float.parseFloat(montantEmprinterTransactionLabel.getText())));
+								+ "FCFA et il ne vous reste plus que: "
+								+ (Float.parseFloat(montantTransactionLabel.getText())
+										- Float.parseFloat(montantEmprinterTransactionLabel.getText())));
 			} else if (Float.parseFloat(montantCourantLabel.getText()) > compteEpargne.getLacarte()) {
-				MethodUtilitaire.deleteNoPersonSelectedAlert("ATTENTION LE MONTANT A EMPRINTE EST SUPERIEUR AU JOCKER",
-						"Attention le montant à emprinté ne doit pas etre supérieur au jocker",
+				MethodUtilitaire.deleteNoPersonSelectedAlert("Attention le montant à emprinté est supérieur à la crédibilité de ce compte garant",
+						"Attention le montant à emprinté ne doit pas etre supérieur à la crédibilité",
 						"Veuillez ajuster le montant du pret au plus a " + compteEpargne.getLacarte() + "FCFA");
 			} else {
+				Long montant = Long.parseLong(montantCourantLabel.getText());
+				if (MethodUtilitaire
+						.confirmationDialog(montant, "Valider la transaction", "Valider la transaction",
+								"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom()
+										+ " effectuera un emprint de: " + montant + "Fcfa",
+								"Valider", "Annuler")) {
+					
+					operation = "pret";
+					
+					Transaction transaction = new Transaction();
+					transaction.setAdherent(adherent);
+					transaction.setDate(new Date());
+					transaction.setMontant(montant);
+					transaction.setType(operation);
+					
+					CompteTampon compteTampon = compteEpargneDeCeluiQuiEmprinte.getCompteTampon();
+					CompteCreance compteCreance = compteEpargne.getCompteCreance();
 
-				Transaction transaction = new Transaction();
-				transaction.setAdherent(adherent);
-				transaction.setDate(new Date());
-				transaction.setMontant(Float.parseFloat(montantCourantLabel.getText()));
-				transaction.setType(operation);
-				if (MethodUtilitaire.confirmationDialog(transaction, "VALIDER LA TRANSACTION", "VALIDER LA TRANSACTION",
-						"L'adhérent " + adherent.getNom() + " " + adherent.getPrenom() + " effectuera un emprint de: "
-								+ transaction.getMontant() + "Fcfa")) {
-					CompteTampon compteTampon = compteTamponRepository.findOne(adherent.getIdentifiant());
-					CompteCreance compteCreance = compteCreanceRepository.findOne(compteEpargne.getEpargneId());
-					if (compteTampon == null) {
-						compteTampon = new CompteTampon();
-						compteTampon.setIdTampon(adherent.getIdentifiant());
-						compteTampon.setDette(Float.parseFloat(montantCourantLabel.getText()));
-						compteTamponRepository.save(compteTampon);
-						System.out.println("Set new compte tampon");
-					} else {
-						compteTampon
-								.setDette(compteTampon.getDette() + Float.parseFloat(montantCourantLabel.getText()));
-						compteTamponServiceImplement.update(compteTampon);
-						System.out.println("Set old compte tampon");
-					}
-					if (compteCreance == null) {
-						compteCreance = new CompteCreance();
-						compteCreance.setIdCreance(compteEpargne.getEpargneId());
-						compteCreance.setMontant(Float.parseFloat(montantCourantLabel.getText()));
-						compteCreanceRepository.save(compteCreance);
-						System.out.println("Set new compte creance");
-					} else {
-						compteCreance.setMontant(
-								compteCreance.getMontant() + Float.parseFloat(montantCourantLabel.getText()));
-						compteCreanceServiceImplement.update(compteCreance);
-						System.out.println("Set old compte creance");
-					}
+					compteTampon.setDette(compteTampon.getDette() + Long.parseLong(montantCourantLabel.getText()));
+					compteTamponServiceImplement.update(compteTampon);
+
+
+					compteCreance
+							.setMontant(compteCreance.getMontant() + Long.parseLong(montantCourantLabel.getText()));
+					compteCreanceServiceImplement.update(compteCreance);
+
 					Transaction savedTransaction = transactionRepository.save(transaction);
 					// set la carte de l'avalise
 					compteEpargne.setAvaliser(true);
 					compteEpargne
-							.setLacarte(compteEpargne.getLacarte() - Float.parseFloat(montantCourantLabel.getText()));//apres emprint la carte n'est pas a jour
-					compteEpargneServiceImplement.update(compteEpargne);
+							.setLacarte(compteEpargne.getLacarte() - Long.parseLong(montantCourantLabel.getText()));
+					CompteEpargne updatedCompteEpargneAvalise = compteEpargneServiceImplement.update(compteEpargne);
+					System.out.println("mise a jour réussie");
 					
-					//set la carte du compte epargne de l'emprinteur
-					System.out.println("***************** Montant   *****************"+montantCourantLabel.getText());
-					System.out.println("***************** La catrte ******************"+compteEpargneDeCeluiQuiEmprinte.getLacarte());
-					System.out.println("***************** montant courang ******************"+Float.parseFloat(montantCourantLabel.getText()));
-					System.out.println("***************** La catrte ******************"+montantCourantLabel.getText());
-					System.out.println("***************** Résultat ****************** "+(compteEpargneDeCeluiQuiEmprinte.getLacarte() - Float.parseFloat(montantCourantLabel.getText())));
-					//compteEpargneDeCeluiQuiEmprinte.setLacarte(compteEpargneDeCeluiQuiEmprinte.getLacarte() - Float.parseFloat(montantCourantLabel.getText()));
-					//compteEpargneServiceImplement.update(compteEpargneDeCeluiQuiEmprinte);
+					// Compte epargneDetail
+
+					String date = DateUtil.format(LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+
+					//Pour celui qui met son compte en gage
+				
+					CompteEpargneDetail cd = CompteDetailHelper.factoryCompteEpargneDetail(updatedCompteEpargneAvalise, date);					
+																											
+					//Pour celui qui emprinte
+					
+					CompteEpargneDetail cde = CompteDetailHelper.factoryCompteEpargneDetail(compteEpargneDeCeluiQuiEmprinte, date);																								
+																												
+				
+					compteEpargneDetailRepository.save(cd);
+					compteEpargneDetailRepository.save(cde);
 
 					// avalie create
 					Avalise avalise = new Avalise();
-					avalise.setCompteEpargne(compteEpargne);
+					avalise.setCompteEpargne(updatedCompteEpargneAvalise);
 					avalise.setCompteTampon(compteTampon);
 					avalise.setCompteCreance(compteCreance);
-					avalise.setMontant(Float.parseFloat(montantCourantLabel.getText()));
+					avalise.setMontant(Long.parseLong(montantCourantLabel.getText()));
 					avalise.setRemboursser(false);
-					avalise.setSolder((float) 0);
+					avalise.setSolder((long) 0);
 					avalise.setTransaction(savedTransaction);
 					avaliseRepository.save(avalise);
-					
-					montantEmprinterTransactionLabel.setText(String.valueOf(Float.parseFloat(montantEmprinterTransactionLabel.getText()) + Float.parseFloat(montantCourantLabel.getText())));
+
+					montantEmprinterTransactionLabel
+							.setText(String.valueOf(Float.parseFloat(montantEmprinterTransactionLabel.getText())
+									+ Float.parseFloat(montantCourantLabel.getText())));
 					MethodUtilitaire.saveAlert(savedTransaction, "EMPRINT EFFECTUE AVEC SUCCES",
 							"L'adhérent " + adherent.getNom() + "" + adherent.getPrenom() + " à emprinter "
 									+ savedTransaction.getMontant() + "Fcfa issu du compte de "
 									+ compteEpargne.getAdherent().getNom() + " "
 									+ compteEpargne.getAdherent().getPrenom());
-					LoadDataOnTable(Float.parseFloat(montantString)
-							- Float.parseFloat(montantEmprinterTransactionLabel.getText()));
+					LoadDataOnTable();
+
+					// On met a jour la table des transaction
+					t.LoadDataOnTable();
+					
+					//Met a jour les détails des actif sur la home
+					homeController.setActifDetail();
+					
 					methodUtilitaire.LogFile("Opération de " + operation,
-							compteEpargneDeCeluiQuiEmprinte.getAdherent().getNom() + " " + compteEpargneDeCeluiQuiEmprinte.getAdherent().getPrenom() + " <<Emprinte a>> "
+							compteEpargneDeCeluiQuiEmprinte.getAdherent().getNom() + " "
+									+ compteEpargneDeCeluiQuiEmprinte.getAdherent().getPrenom() + " <<Emprinte a>> "
 									+ compteEpargne.getAdherent().getNom() + " "
 									+ compteEpargne.getAdherent().getPrenom(),
-							MethodUtilitaire.deserializationUser());
+							MethodUtilitaire.deserializationUser(), savedTransaction.getDate());
 				}
 
 			}
@@ -331,17 +345,17 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 						emprinter.textProperty().addListener((observable, oldValue, newValue) -> {
 							montantCourantLabel.getStyleClass().add("label-header");
 							montantCourantLabel.setText(newValue);
-							if (emprinter.getText().trim().length() != 0) {
+							if (emprinter.getText().trim().length() > 0) {
 								System.out.println(emprinter.getText().trim().length());
 								CompteEpargne selectedAccount = compteEpargneAvaliseEmprinterTable.getItems()
 										.get(getIndex());
-								compteEpargneAvaliseEmprinterTable.getItems().removeIf(row -> row != selectedAccount);
+								garantLabel.setText(selectedAccount.getAdherent().getUniqueName());
+								//compteEpargneAvaliseEmprinterTable.getItems().removeIf(row -> row != selectedAccount);
 								System.out.println("bingo");
 							} else {
 								// compteEpargneAvaliseEmprinterTable.setItems(compteEpargnesList);
-								System.out.println("No bingo");
-								LoadDataOnTable(Float.parseFloat(montantString)
-										- Float.parseFloat(montantEmprinterTransactionLabel.getText()));
+								garantLabel.setText(null);
+								//LoadDataOnTable();
 							}
 						});
 						setGraphic(emprinter);
@@ -380,7 +394,7 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 
 						btnEdit.setStyle("-fx-background-color: transparent;");
 						ImageView iv = new ImageView();
-						iv.setImage(imgEdit);
+						//iv.setImage(imgEdit);
 						iv.setPreserveRatio(true);
 						iv.setSmooth(true);
 						iv.setCache(true);
@@ -392,7 +406,8 @@ public class AvaliseEmprintEditDialogController implements Initializable {
 					}
 				}
 
-				private void updaterAvalise(CompteEpargne compteEpargneServantDeAvalise, CompteEpargne compteEpargneDeCeluiQuiEmprinte) throws Exception{
+				private void updaterAvalise(CompteEpargne compteEpargneServantDeAvalise,
+						CompteEpargne compteEpargneDeCeluiQuiEmprinte) throws Exception {
 					validateActionClick(compteEpargneServantDeAvalise, compteEpargneDeCeluiQuiEmprinte);
 				}
 			};

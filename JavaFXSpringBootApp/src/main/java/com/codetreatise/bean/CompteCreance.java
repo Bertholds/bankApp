@@ -29,7 +29,7 @@ public class CompteCreance implements Serializable {
 	@Id
 	@Column(nullable=false, updatable=false)
 	private Long idCreance;
-	private float montant;
+	private Long montant;
 	
 	public CompteCreance() {
 		// TODO Auto-generated constructor stub
@@ -52,14 +52,14 @@ public class CompteCreance implements Serializable {
 	/**
 	 * @return the montant
 	 */
-	public float getMontant() {
+	public Long getMontant() {
 		return montant;
 	}
 
 	/**
 	 * @param montant the montant to set
 	 */
-	public void setMontant(float montant) {
+	public void setMontant(Long montant) {
 		this.montant = montant;
 	}
 

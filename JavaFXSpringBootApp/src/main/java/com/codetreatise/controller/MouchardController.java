@@ -62,14 +62,15 @@ public class MouchardController implements Initializable {
 
 		if (selectedItems.size() != 0) {
 			if (MethodUtilitaire.confirmationDialog(operation, "Confirmation de suppression",
-					"Confirmation de suppression", "Voulez vous supprimer cette liste d'operations ?")) {
-				//operationTab.getItems().removeAll(selectedIDs);
-					operationRepository.deleteInBatch(selectedItems);
-				MethodUtilitaire.saveAlert(null, "Suppression reussie", "La suppression s'est effectu�e avec succ�s");
+					"Confirmation de suppression", "Voulez vous supprimer cette liste d'operations ?", "Oui", "Non")) {
+				// operationTab.getItems().removeAll(selectedIDs);
+				operationRepository.deleteInBatch(selectedItems);
+				MethodUtilitaire.saveAlert(null, "Suppression reussie", "La suppression s'est effectué avec succès");
+				loadDataOnTable();
 			}
 		} else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Op�ration non selectionn�e", "Op�ration non selectionn�e",
-					"Selectionner au prealable l'op�ration a supprimer et reessayer");
+			MethodUtilitaire.deleteNoPersonSelectedAlert("Opération non selectionnée", "Opération non selectionnée",
+					"Selectionner au prealable l'opération a supprimer et reessayer");
 		}
 	}
 
@@ -84,7 +85,7 @@ public class MouchardController implements Initializable {
 		operationList.addAll(operationRepository.findAll());
 		operationTab.setItems(operationList);
 	}
-	
+
 	// Event Listener on Button.onAction
 	@FXML
 	public void handleDeleteAllClick(ActionEvent event) {
@@ -92,11 +93,11 @@ public class MouchardController implements Initializable {
 		ObservableList<Operation> operation = operationTab.getSelectionModel().getSelectedItems();
 		if (operation.size() != 0) {
 			if (MethodUtilitaire.confirmationDialog(null, "Confirmation de suppression", "Confirmation de suppression",
-					"Voulez vous vider lma liste des op�rations effectu�es au sein du syst�me ?")) {
-			//	operationTab.getItems().removeAll(operation);
+					"Voulez vous vider la liste des opérations effectuées au sein du système ?", "Oui", "Non")) {
+				// operationTab.getItems().removeAll(operation);
 				operationRepository.deleteAll();
 				MethodUtilitaire.saveAlert(null, "Suppression reussie",
-						"Toutes les op�rations ont �t� effac�es avec succ�s !");
+						"Toutes les opérations ont été effacées avec succès !");
 				loadDataOnTable();
 			}
 		} else {
@@ -104,6 +105,7 @@ public class MouchardController implements Initializable {
 					"No items to delete in table.");
 		}
 	}
+	
 
 	// Event Listener on TextField.onKeyReleased
 	@FXML
@@ -164,6 +166,5 @@ public class MouchardController implements Initializable {
 						return new SimpleStringProperty(param.getValue().getUtilisateur().getPseudo());
 					}
 				});
-
 	}
 }

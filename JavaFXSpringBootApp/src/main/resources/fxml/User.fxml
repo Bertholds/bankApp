@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="553.0" prefWidth="755.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.UserController">
+<AnchorPane prefHeight="553.0" prefWidth="655.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.UserController">
    <children>
       <SplitPane dividerPositions="0.4916030534351145" layoutX="194.0" layoutY="146.0" prefHeight="553.0" prefWidth="655.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -28,12 +28,12 @@
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="74.66666412353516" minHeight="10.0" prefHeight="74.66666412353516" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="61.333335876464844" minHeight="10.0" prefHeight="61.333335876464844" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <ComboBox fx:id="memberId" prefHeight="66.0" prefWidth="946.0" promptText="Choisir parmi les adhérnts">
+                        <ComboBox fx:id="memberId" prefHeight="51.0" prefWidth="946.0" promptText="Choisir parmi les adhérnts">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></ComboBox>
@@ -64,7 +64,7 @@
                         </HBox>
                      </children>
                   </GridPane>
-                  <Button id="buton-compte" alignment="BOTTOM_CENTER" contentDisplay="TOP" layoutX="80.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleUserAccountClick" prefHeight="200.0" prefWidth="203.0" style="-fx-border-radius: 100px;" text="Switch to account" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="85.0">
+                  <Button id="buton-compte" alignment="BOTTOM_CENTER" contentDisplay="TOP" layoutX="54.0" layoutY="282.0" mnemonicParsing="false" onAction="#handleUserAccountClick" prefHeight="138.0" prefWidth="203.0" style="-fx-border-radius: 100px;" text="Switch to account" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="61.0">
                      <font>
                         <Font name="Times New Roman Bold" size="15.0" />
                      </font>
@@ -72,14 +72,14 @@
                         <Insets bottom="30.0" />
                      </padding>
                      <graphic>
-                        <FontAwesomeIconView glyphName="USERS" size="90" text="" textAlignment="CENTER" />
+                        <FontAwesomeIconView glyphName="USERS" size="60" text="" textAlignment="CENTER" />
                      </graphic>
                   </Button>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TableView fx:id="utilisateurTable" layoutX="-4.0" layoutY="79.0" prefHeight="473.0" prefWidth="338.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="-4.0" AnchorPane.topAnchor="79.0">
+                  <TableView fx:id="utilisateurTable" layoutX="-4.0" layoutY="83.0" prefHeight="469.0" prefWidth="337.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="-4.0" AnchorPane.topAnchor="83.0">
                     <columns>
                       <TableColumn fx:id="IdTableColumn" prefWidth="75.0" text="ID user" />
                         <TableColumn fx:id="pseudoTableColumn" prefWidth="75.0" text="Pseudo" />

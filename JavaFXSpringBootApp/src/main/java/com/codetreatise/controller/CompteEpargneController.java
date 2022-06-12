@@ -1,8 +1,14 @@
 package com.codetreatise.controller;
 
+import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +16,22 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 
 import com.codetreatise.bean.Adherent;
+import com.codetreatise.bean.Avalise;
+import com.codetreatise.bean.CompteCreance;
 import com.codetreatise.bean.CompteEpargne;
+import com.codetreatise.bean.CompteTampon;
 import com.codetreatise.config.StageManager;
 import com.codetreatise.repository.AdherentRepository;
+import com.codetreatise.repository.AvaliseRepository;
+import com.codetreatise.repository.CompteCreanceRepository;
 import com.codetreatise.repository.CompteEpargneRepository;
+import com.codetreatise.repository.CompteTamponRepository;
 import com.codetreatise.service.MethodUtilitaire;
+import com.codetreatise.service.impl.AdherentServiceImpl;
 import com.codetreatise.service.impl.CompteEpargneServiceImplement;
 import com.codetreatise.view.FxmlView;
 
-import javafx.application.Platform;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,9 +42,11 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Accordion;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -43,8 +58,6 @@ public class CompteEpargneController implements Initializable {
 	@FXML
 	private ComboBox<String> memberId;
 	@FXML
-	private TextField id;
-	@FXML
 	private TextField fond;
 	@FXML
 	private TableView<CompteEpargne> compteEpargneTable;
@@ -55,17 +68,37 @@ public class CompteEpargneController implements Initializable {
 	@FXML
 	private TableColumn<CompteEpargne, String> prenomTableColumn;
 	@FXML
-	private TableColumn<CompteEpargne, Float> soldeTableColumn;
+	private TableColumn<CompteEpargne, Long> soldeTableColumn;
 	@FXML
-	private TableColumn<CompteEpargne, Float> fondTableColun;
-	@FXML
-	private TableColumn<CompteEpargne, Boolean> avaliseTableColun;
+	private TableColumn<CompteEpargne, Long> credibiliteTableColun;
 	@FXML
 	private TextField search;
 	@FXML
 	private Button btnFond;
 	@FXML
-	private Accordion accordionAccordAvalise;
+	private Label pretLabel;
+	@FXML
+	private Label credibiliteLabel;
+	@FXML
+	private Label soldeLabel;
+	@FXML
+	private Label prenomLabel;
+	@FXML
+	private Label nomLabel;
+	@FXML
+	private Label idLabel;
+
+	@FXML
+	private Button consulterEngagement;
+
+	@FXML
+	private Button btnCreer;
+
+	@FXML
+	private Button btnDesactivate;
+
+	@FXML
+	private FontAwesomeIconView desactivateIcon;
 
 	@Autowired
 	private CompteEpargneMoreDetailController dialog;
@@ -74,7 +107,19 @@ public class CompteEpargneController implements Initializable {
 	private CompteEpargneRepository compteEpargneRepository;
 
 	@Autowired
+	private CompteTamponRepository compteTamponRepository;
+
+	@Autowired
+	private CompteCreanceRepository compteCreanceRepository;
+	
+	@Autowired
+	private AvaliseRepository avaliseRepository;
+
+	@Autowired
 	private CompteEpargneServiceImplement compteEpargneServiceImplement;
+
+	@Autowired
+	private AdherentServiceImpl adherentServiceImpl;
 
 	@Autowired
 	private AdherentRepository adherentRepository;
@@ -86,133 +131,173 @@ public class CompteEpargneController implements Initializable {
 	@Lazy
 	private StageManager stageManager;
 
+	private CompteEpargne selectedAccount;
+
 	ObservableList<CompteEpargne> compteEpargneList = FXCollections.observableArrayList();
 
-	ObservableList<String> adherentsList = FXCollections.observableArrayList();
-
-	// Event Listener on Button.onAction
-	@FXML
-	public void handleClearClick(ActionEvent event) {
-		clearFields();
-	}
+	List<String> adherentUniqueName;
+	
+	List<Avalise> engagementList;
 
 	@FXML
-	public void handleShowMoreDetailClick() {
-		CompteEpargne selectedAccount = compteEpargneTable.getSelectionModel().getSelectedItem();
-		if (selectedAccount != null) {
-			stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.COMPTEEPARGNEMOREDETAIL);
-			dialog.setValue(selectedAccount);
-		} else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Warning no bank account selected",
-					"Warning no bank account selected", "Please select one or many bank account and try.");
-		}
+	private void handleconsulterEngagement() {
+		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.COMPTEEPARGNEMOREDETAIL);
+		dialog.setValue(selectedAccount, engagementList);
 	}
 
 	@FXML
 	public void handleAdvancedClick() {
-		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.MANAGECOMPTEEPARGNE);
+		stageManager.switchSceneShowPreviousStage(FxmlView.MANAGECOMPTEEPARGNE);
 	}
 
-	@FXML
-	public void handleFondClick(ActionEvent event) {
-		if (getFond() == null || getFond().trim().isEmpty()) {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Erreur de validation", "La valeur du solde est null", "");
-		} else {
-			try {
-				Float val = Float.parseFloat(fond.getText());
-				CompteEpargne compteEpargne = compteEpargneTable.getSelectionModel().getSelectedItem();
-				compteEpargne.setFond(val);
-				compteEpargneServiceImplement.update(compteEpargne);
-				MethodUtilitaire.saveAlert(compteEpargne, "Opération réussi",
-						"Le fond de " + compteEpargne.getAdherent().getNom() + " "
-								+ compteEpargne.getAdherent().getPrenom() + " a été défini avec succès");
-				btnFond.setDisable(true);
-				LoadDataOnTable();
-				methodUtilitaire.LogFile("Définir le fond du compte bancaire",
-						compteEpargne.getAdherent().getNom() + " " + compteEpargne.getAdherent().getPrenom(),
-						MethodUtilitaire.deserializationUser());
-			} catch (Exception e) {
-				e.printStackTrace();
-				MethodUtilitaire.deleteNoPersonSelectedAlert("Valeur incorrect", "La valeur du fond est incorrect", "");
-			}
-		}
-	}
 
 	// Event Listener on Button.onAction
 	@FXML
-	public void handleDeleteClick(ActionEvent event) throws Exception {
+	public void handleDesactivateClick(ActionEvent event) throws Exception {
 		CompteEpargne compteEpargne = compteEpargneTable.getSelectionModel().getSelectedItem();
 		if (compteEpargne != null) {
-			if (MethodUtilitaire.confirmationDialog(event, "Confirm to delete selected bank account ?",
-					"Confirm to delete selected bank account ?", "")) {
-				compteEpargneRepository.delete(compteEpargne);
+
+			if (MethodUtilitaire.confirmationDialog(compteEpargne, "Opération recursive", "Opération recursive",
+					"La désactivation d'un compte épargne de " + compteEpargne.getAdherent().getUniqueName()
+							+ "entrainera respectivement la désactivation de son profil en tant que membre",
+					"Valider", "Annuler")) {
+
+				compteEpargne.setStatut("Inactif");
+				compteEpargneServiceImplement.update(compteEpargne);
 				LoadDataOnTable();
-				MethodUtilitaire.saveAlert(event, "Delete operation successful", "Delete operation successful");
-				methodUtilitaire.LogFile("Suppression du fond du compte bancaire",
+				// Désactive l'adhérent titulaire du compte
+				Adherent adherent = compteEpargne.getAdherent();
+				adherent.setSituation("Inactif");
+				adherentServiceImpl.update(adherent);
+
+				btnDesactivate.setDisable(true);
+
+				MethodUtilitaire.saveAlert(event, "Désactivation réussie", "Désactivation réussie");
+				methodUtilitaire.LogFile("Désactivation compte epargne",
 						compteEpargne.getAdherent().getNom() + " " + compteEpargne.getAdherent().getPrenom(),
-						MethodUtilitaire.deserializationUser());
+						MethodUtilitaire.deserializationUser(), new Date(System.currentTimeMillis()));
 			}
+
 		} else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Warning no bank account selected",
-					"Warning no bank account selected", "Please select one or many bank account and try.");
+
+			System.out.println("Trim: " + memberId.getEditor().getText().trim().length());
+			if (memberId.getEditor().getText().trim().length() > 0) {
+				MethodUtilitaire.deleteNoPersonSelectedAlert("Attention titulaire de compte innexistant",
+						"Attention titulaire de compte innexistant",
+						"SVP vérifier bien l'orthographe du nom et assurer vous de la correspondance parmi les noms figurant dans la liste des titulaire de compte  ");
+			} else {
+				MethodUtilitaire.deleteNoPersonSelectedAlert("Attention aucun titulaire de compte sélectionné",
+						"Attention aucun titulaire de compte sélectionné",
+						"SVP sélectionné un titulaire de compte et réessayer.");
+			}
+
 		}
+
+	}
+
+	private void checkCreateAccount() {
+		adherentUniqueName = new ArrayList<>();
+		List<Adherent> adherents = adherentRepository.findBySituation("Actif");
+
+		if (adherents != null) {
+			for (Adherent adherent : adherents) {
+				// On se rassure qu'il n'as pas de compte épargne
+				if (compteEpargneRepository.findByAdherent(adherent) == null) {
+					adherentUniqueName.add(adherent.getUniqueName());
+				}
+
+			}
+			
+			if(adherentUniqueName.size() == 0) {
+				btnCreer.setDisable(true);
+			}
+			
+		}
+
 	}
 
 	// Event Listener on Button.onAction
 	@FXML
 	public void handleCreateClick(ActionEvent event) throws Exception {
-		if (MethodUtilitaire.emptyValidation("Titulaire du compte", getAdherentNom() == null)) {
 
-			try {
-				// peut généré NullPointerExeption
-				CompteEpargne oldAccount = compteEpargneRepository.findByAdherent(getAdherent());
+		ChoiceDialog<String> dialog = new ChoiceDialog<>("Dérouler la liste", adherentUniqueName);
+		dialog.setTitle("Création d'un compte épargne");
+		dialog.setHeaderText("Création d'un compte épargne");
+		dialog.setContentText("Titulaire du compte:");
 
-				if (oldAccount != null) {
-					if (oldAccount.getStatut() == "Trash") {
-						if (MethodUtilitaire.confirmationDialog(oldAccount,
-								"Attention ce compte avait été suprimer définitivement",
-								"Attention le compte de" + oldAccount.getAdherent().getNom()
-										+ oldAccount.getAdherent().getPrenom() + " avait été suprimer définitivement",
-								"Voulez vous le récuperer")) {
-							oldAccount.setStatut("Actif");
-							compteEpargneServiceImplement.update(oldAccount);
-							clearFields();
-							LoadDataOnTable();
-						}
-					} else {
-						if (MethodUtilitaire.confirmationDialog(oldAccount, "Attention ce compte épargne existe déja",
-								"Ce compte épargne existe déja et est inactif",
-								"Voulez vous l'activez afin de le rendre visible ")) {			
-                           oldAccount.setStatut("Actif");
-                           compteEpargneServiceImplement.update(oldAccount);
-                           clearFields();
-       					   LoadDataOnTable();   
-						}
-					}
-				} else {
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+
+		/*
+		 * if (result.isPresent()){ System.out.println("Your choice: " + result.get());
+		 * }
+		 */
+
+		// The Java 8 way to get the response value (with lambda expression).
+		result.ifPresent(new Consumer<String>() {
+
+			@Override
+			public void accept(String name) {
+
+				try {
+					createAccount(name);
+				} catch (ClassNotFoundException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			private void createAccount(String name) throws UnknownHostException, ClassNotFoundException, IOException {
+
+				Adherent adherent = adherentRepository.findByUniqueName(name);
+
+				if (adherent != null) {
+					CompteTampon compteTampon = new CompteTampon();
+					compteTampon.setIdTampon(adherent.getIdentifiant());
+					compteTampon.setDette((long) 0);
+
+					CompteCreance compteCreance = new CompteCreance();
+					compteCreance.setIdCreance(adherent.getIdentifiant());
+					compteCreance.setMontant((long) 0);
+
 					CompteEpargne compteEpargne = new CompteEpargne();
-					compteEpargne.setAdherent(getAdherent());
+					compteEpargne.setAdherent(adherent);
 					compteEpargne.setAvaliser(false);
-					compteEpargne.setEpargneId(getAdherent().getIdentifiant());
+					compteEpargne.setEpargneId(adherent.getIdentifiant());
+					compteEpargne.setCompteCreance(compteCreance);
+					compteEpargne.setCompteTampon(compteTampon);
 					compteEpargne.setStatut("Actif");
+					compteEpargne.setDateCreation(new Date(System.currentTimeMillis()));
 
+					compteTamponRepository.save(compteTampon);
+					compteCreanceRepository.save(compteCreance);
 					CompteEpargne newCompteEpargne = compteEpargneRepository.save(compteEpargne);
+
 					MethodUtilitaire.saveAlert(newCompteEpargne, "Save compte epargne sucessful",
 							"Bank account of " + newCompteEpargne.getAdherent().getNom() + " "
 									+ newCompteEpargne.getAdherent().getPrenom() + " created successful");
 
-					clearFields();
 					LoadDataOnTable();
+					checkCreateAccount();
+
 					methodUtilitaire.LogFile("Création du fond du compte bancaire",
 							compteEpargne.getAdherent().getNom() + " " + compteEpargne.getAdherent().getPrenom(),
-							MethodUtilitaire.deserializationUser());
+							MethodUtilitaire.deserializationUser(), compteEpargne.getDateCreation());
+				} else {
+					MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun adhérent sélectionné",
+							"Attention aucun adhérent sélectionné",
+							"Sélectionné un adhérent dans la liste déroulante puis reéssayer");
+					try {
+						handleCreateClick(event);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			} catch (Exception e) {
-				MethodUtilitaire.deleteNoPersonSelectedAlert(null, "Titulaire du compte introuvable",
-						"Le titulaire du compte est introuvable; Sélectionner un adhérent dans la liste déroulante ou vérifier l'orthographe du nom & prenom saisi et réessayer");
-			}
 
-		}
+			}
+		});
+
 	}
 
 	// Event Listener on TextField[#search].onKeyReleased
@@ -223,36 +308,23 @@ public class CompteEpargneController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
+		checkCreateAccount();
+		compteEpargneTable.setCursor(Cursor.HAND);
+		consulterEngagement.setVisible(false);
+		btnDesactivate.setDisable(true);
 		SetTableColunProperties();
 		LoadDataOnTable();
-		// compteEpargneTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		setComboboxeAdherent();
-		FilterValueOnComboboxMemberId();
 		compteEpargneTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<CompteEpargne>() {
 			@Override
 			public void changed(ObservableValue<? extends CompteEpargne> observable, CompteEpargne oldValue,
 					CompteEpargne newValue) {
-				clearFields();
-				// setNewValues(newValue);y
-				if (newValue != null) {
-					if (newValue.getFond() == 0) {
-						btnFond.setDisable(false);
-					}
-				} else
-					btnFond.setDisable(true);
+				// utiliser dans autres function
+				selectedAccount = newValue;
+				btnDesactivate.setDisable(false);
+				showCompteEpargneDetail(newValue);
+
 			}
-
 		});
-	}
-
-	public void setComboboxeAdherent() {
-		adherentsList.clear();
-		List<Adherent> adherents = adherentRepository.findBySituation("Actif");
-		for (Adherent adherent : adherents) {
-			adherentsList.add(adherent.getUniqueName());
-		}
-		memberId.setItems(adherentsList);
 	}
 
 	public void LoadDataOnTable() {
@@ -260,6 +332,42 @@ public class CompteEpargneController implements Initializable {
 		compteEpargneList.clear();
 		compteEpargneList.addAll(compteEpargneRepository.findByStatut("Actif"));
 		compteEpargneTable.setItems(compteEpargneList);
+	}
+
+	private void showCompteEpargneDetail(CompteEpargne newValue) {
+
+		if (newValue != null) {
+			
+		    engagementList = avaliseRepository.findCompteByIdAndStatut(newValue, false, newValue.getCompteTampon());
+			
+			consulterEngagement.setVisible(true);
+			idLabel.setText(newValue.getAdherent().getIdentifiant().toString());
+			nomLabel.setText(newValue.getAdherent().getNom());
+			prenomLabel.setText(newValue.getAdherent().getPrenom());
+			soldeLabel.setText(String.valueOf(newValue.getSolde()));
+			credibiliteLabel.setText(String.valueOf(newValue.getLacarte()));
+
+			if (engagementList.size() > 0) {
+				consulterEngagement.setText("Consulter");
+				consulterEngagement.setDisable(false);
+				consulterEngagement.setVisible(true);
+			} else {
+				consulterEngagement.setText("Aucun engagement");
+				consulterEngagement.setDisable(true);
+			}
+
+			Long pret = newValue.getCompteTampon().getDette();
+			pretLabel.setText(String.valueOf(pret));
+		} else {
+			idLabel.setText(null);
+			consulterEngagement.setVisible(false);
+			nomLabel.setText(null);
+			prenomLabel.setText(null);
+			soldeLabel.setText(null);
+			credibiliteLabel.setText(null);
+			pretLabel.setText(null);
+		}
+
 	}
 
 	private void SetTableColunProperties() {
@@ -272,87 +380,40 @@ public class CompteEpargneController implements Initializable {
 			return new SimpleStringProperty(celData.getValue().getAdherent().getPrenom());
 		});
 		soldeTableColumn.setCellValueFactory(new PropertyValueFactory<>("solde"));
-		fondTableColun.setCellValueFactory(new PropertyValueFactory<>("fond"));
-		avaliseTableColun.setCellValueFactory(new PropertyValueFactory<>("avaliser"));
+		credibiliteTableColun.setCellValueFactory(new PropertyValueFactory<>("lacarte"));
 	}
 
-	private void FilterValueOnComboboxMemberId() {
-
-		// Create a FilteredList wrapping the ObservableList.
-		FilteredList<String> filteredItems = new FilteredList<String>(adherentsList, p -> true);
-
-		// Add a listener to the textProperty of the combobox editor. The
-		// listener will simply filter the list every time the input is changed
-		// as long as the user hasn't selected an item in the list.
-		memberId.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			final TextField editor = memberId.getEditor();
-			final String selected = memberId.getSelectionModel().getSelectedItem();
-
-			// This needs run on the GUI thread to avoid the error described
-			// here: https://bugs.openjdk.java.net/browse/JDK-8081700.
-			Platform.runLater(() -> {
-				// If the no item in the list is selected or the selected item
-				// isn't equal to the current input, we refilter the list.
-				if (selected == null || !selected.equals(editor.getText())) {
-					filteredItems.setPredicate(item -> {
-						// We return true for any items that starts with the
-						// same letters as the input. We use toUpperCase to
-						// avoid case sensitivity.
-						if (item.toUpperCase().startsWith(newValue.toUpperCase())) {
-							return true;
-						} else {
-							return false;
-						}
-					});
-				}
-			});
-		});
-
-		memberId.setItems(filteredItems);
-
-	}
-
-	private void clearFields() {
-		id.clear();
-		memberId.getSelectionModel().clearSelection();
-		fond.clear();
-	}
-
-	private String getAdherentNom() {
-		return memberId.getSelectionModel().getSelectedItem();
-	}
+	/*
+	 * private void FilterValueOnComboboxMemberIdf() {
+	 * 
+	 * // Create a FilteredList wrapping the ObservableList. FilteredList<String>
+	 * filteredItems = new FilteredList<String>(adherentsList, p -> true);
+	 * 
+	 * // Add a listener to the textProperty of the combobox editor. The // listener
+	 * will simply filter the list every time the input is changed // as long as the
+	 * user hasn't selected an item in the list.
+	 * memberId.getEditor().textProperty().addListener((obs, oldValue, newValue) ->
+	 * { final TextField editor = memberId.getEditor(); final String selected =
+	 * memberId.getSelectionModel().getSelectedItem();
+	 * 
+	 * // This needs run on the GUI thread to avoid the error described // here:
+	 * https://bugs.openjdk.java.net/browse/JDK-8081700. Platform.runLater(() -> {
+	 * // If the no item in the list is selected or the selected item // isn't equal
+	 * to the current input, we refilter the list. if (selected == null ||
+	 * !selected.equals(editor.getText())) { filteredItems.setPredicate(item -> { //
+	 * We return true for any items that starts with the // same letters as the
+	 * input. We use toUpperCase to // avoid case sensitivity. if
+	 * (item.toUpperCase().startsWith(newValue.toUpperCase())) { return true; } else
+	 * { return false; } }); } }); });
+	 * 
+	 * memberId.setItems(filteredItems);
+	 * 
+	 * }
+	 */
 
 	private String getFond() {
 		return fond.getText();
 	}
-
-	private Long getEpargneId() {
-		return getAdherent().getIdentifiant();
-	}
-
-	private Adherent getAdherent() {
-		Adherent adherent = null;
-		String uniqueName = memberId.getSelectionModel().getSelectedItem();
-		// Long id =
-		// Long.valueOf(memberId.getSelectionModel().getSelectedItem().substring(size -
-		// 1, size));
-		adherent = adherentRepository.findByUniqueName(uniqueName);
-		return adherent;
-	}
-
-	/*
-	 * private void setNewValues(CompteEpargne compteEpargne) { if (compteEpargne !=
-	 * null) { id.setText(compteEpargne.getEpargneId().toString());
-	 * memberId.getSelectionModel().select(getMemberNameOnCombobox(compteEpargne));
-	 * } }
-	 */
-
-	/*
-	 * private String getMemberNameOnCombobox(CompteEpargne compteEpargne) { return
-	 * compteEpargne.getAdherent().getNom() + " " +
-	 * compteEpargne.getAdherent().getPrenom(); }
-	 * 
-	 */
 
 	private void filteredTable(KeyEvent event) {
 		FilteredList<CompteEpargne> filteredCompteEpargne = new FilteredList<CompteEpargne>(compteEpargneList,

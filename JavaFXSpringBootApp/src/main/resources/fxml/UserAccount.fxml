@@ -18,9 +18,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="553.0" prefWidth="750.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.UserAccountController">
+<AnchorPane prefHeight="553.0" prefWidth="655.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.UserAccountController">
    <children>
-      <SplitPane dividerPositions="0.4916030534351145" layoutX="194.0" layoutY="146.0" prefHeight="553.0" prefWidth="655.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.5816793893129771" layoutX="194.0" layoutY="146.0" prefHeight="553.0" prefWidth="655.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: rgb(72, 73, 74);">
                <children>
@@ -41,9 +41,9 @@
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></ComboBox>
-                        <HBox alignment="BOTTOM_LEFT" prefWidth="349.0" GridPane.rowIndex="5">
+                        <HBox alignment="BOTTOM_LEFT" GridPane.rowIndex="5">
                            <children>
-                            <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#handleCreateClick" prefHeight="45.0" prefWidth="92.0" text="Creer">
+                            <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#handleCreateClick" prefHeight="45.0" prefWidth="117.0" text="Creer">
                                  <graphic>
                                     <Icons525View glyphName="USER_PLUS" size="20" />
                                  </graphic>
@@ -53,7 +53,7 @@
                                     <Icons525View glyphName="BIN" size="20" />
                                  </graphic>
                               </Button>
-                              <Button mnemonicParsing="false" onAction="#handleEditClick" prefHeight="45.0" prefWidth="83.0" text="Editer">
+                              <Button mnemonicParsing="false" onAction="#handleEditClick" prefHeight="45.0" prefWidth="92.0" text="Editer">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PENCIL" size="20" />
                                  </graphic>
@@ -71,7 +71,7 @@
                         <ComboBox fx:id="droitAccess" prefHeight="45.0" prefWidth="993.0" promptText="Droit d'access" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
-                  <Button id="buton-compte" alignment="BOTTOM_CENTER" contentDisplay="TOP" layoutX="108.0" layoutY="368.0" mnemonicParsing="false" onAction="#handleSwitchUserClick" prefHeight="152.0" prefWidth="148.0" style="-fx-border-radius: 100px;" text="Switch to user" textAlignment="CENTER" AnchorPane.leftAnchor="108.0" AnchorPane.rightAnchor="108.0">
+                  <Button id="buton-compte" alignment="BOTTOM_CENTER" contentDisplay="TOP" layoutX="82.0" layoutY="398.0" mnemonicParsing="false" onAction="#handleSwitchUserClick" prefHeight="127.0" prefWidth="155.0" style="-fx-border-radius: 100px;" text="Switch to user" textAlignment="CENTER" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="81.0">
                      <font>
                         <Font name="Times New Roman Bold" size="15.0" />
                      </font>
@@ -79,7 +79,7 @@
                         <Insets bottom="30.0" />
                      </padding>
                      <graphic>
-                        <FontAwesomeIconView glyphName="USER" size="80" textAlignment="CENTER" />
+                        <FontAwesomeIconView glyphName="USER" size="60" textAlignment="CENTER" />
                      </graphic>
                   </Button>
                </children>
@@ -91,14 +91,13 @@
                       <TableColumn fx:id="IdTableColumn" prefWidth="74.0" text="ID" />
                         <TableColumn fx:id="pseudoTableColumn" prefWidth="144.0" text="Pseudo" />
                         <TableColumn fx:id="accesTableColumn" prefWidth="75.0" text="Accès" />
-                        <TableColumn fx:id="loginTableColumn" prefWidth="75.0" text="Login" />
                         <TableColumn fx:id="editTableColumn" prefWidth="75.0" text="Edit" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
-                  <TextField fx:id="search" layoutX="4.0" layoutY="11.0" onKeyReleased="#handleSearchReleased" prefHeight="45.0" prefWidth="320.0" promptText="Search" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="11.0" />
+                  <TextField fx:id="search" layoutX="4.0" layoutY="7.0" onKeyReleased="#handleSearchReleased" prefHeight="42.0" prefWidth="369.0" promptText="Search" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="7.0" />
                </children>
             </AnchorPane>
         </items>

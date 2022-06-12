@@ -33,8 +33,8 @@
                         </TableView>
                      </content>
                   </ScrollPane>
-                  <TextField fx:id="adherentFiltre" layoutX="198.0" layoutY="13.0" onKeyReleased="#adherentFiltrePressed" prefHeight="28.0" prefWidth="344.0" promptText="Taper pour rechercher" styleClass="search-text-field" AnchorPane.rightAnchor="6.0" />
-                  <OctIconView glyphName="SEARCH" layoutX="296.0" layoutY="39.0" size="20" />
+                  <TextField fx:id="adherentFiltre" layoutX="198.0" layoutY="13.0" onKeyReleased="#adherentFiltrePressed" prefHeight="30.0" prefWidth="279.0" promptText="Taper pour rechercher" styleClass="search-text-field" AnchorPane.rightAnchor="34.0" />
+                  <OctIconView glyphName="SEARCH" layoutX="287.0" layoutY="34.0" size="15" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" styleClass="background-color"> 
@@ -58,13 +58,13 @@
                         <Label text="iDentifiant" />
                         <Label text="Nom" GridPane.rowIndex="1" />
                         <Label text="Prenom" GridPane.rowIndex="2" />
-                        <Label text="Date naissance" GridPane.rowIndex="3" />
+                        <Label text="Numéro de cni" GridPane.rowIndex="3" />
                         <Label text="Lieu naissance" GridPane.rowIndex="4" />
                         <Label text="Fonction" GridPane.rowIndex="5" />
                         <Label fx:id="adherentIdLabel" styleClass="label-bright" GridPane.columnIndex="1" />
                         <Label fx:id="adherentNomLael" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label fx:id="adherentPrenomLabel" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label fx:id="AdherentDateNaissLabel" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label fx:id="cniLabel" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Label fx:id="adherentLieuNaissLabel" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <Label fx:id="adherentFonctionLabel" styleClass="label-bright" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                         <Label style="-fx-text-fill: rgb(0, 255, 0);" text="Statut" GridPane.rowIndex="6" />
@@ -79,7 +79,7 @@
                         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleDeleteClick" prefHeight="35.0" prefWidth="238.0" text="Supprimer Définitivement">
+                        <Button fx:id="btnDelete" alignment="CENTER" mnemonicParsing="false" onAction="#handleDeleteClick" prefHeight="35.0" prefWidth="238.0" text="Supprimer Définitivement">
                            <graphic>
                               <OctIconView glyphName="TRASHCAN" size="20" />
                            </graphic>

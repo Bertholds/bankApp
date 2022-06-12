@@ -36,7 +36,7 @@ public class Fond implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long fondId;
 	
-	private long solde;
+	private Long solde;
 	
 	@OneToOne
 	private CompteEpargne compteEpargne;
@@ -44,14 +44,14 @@ public class Fond implements Serializable{
 	/**
 	 * @return the solde
 	 */
-	public long getSolde() {
+	public Long getSolde() {
 		return solde;
 	}
 
 	/**
 	 * @param solde the solde to set
 	 */
-	public void setSolde(long solde) {
+	public void setSolde(Long solde) {
 		this.solde = solde;
 	}
 

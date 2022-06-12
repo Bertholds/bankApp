@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1296.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.MouchardController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.MouchardController">
    <children>
       <TabPane layoutX="14.0" layoutY="38.0" prefHeight="612.0" prefWidth="1296.0" stylesheets="@../styles/Styles.css" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -21,16 +21,13 @@
                      <children>
                         <TableView fx:id="operationTab" editable="true" layoutX="9.0" layoutY="78.0" prefHeight="456.0" prefWidth="1279.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="51.0">
                           <columns>
-                            <TableColumn fx:id="id" prefWidth="75.0" text="Id operation" />
-                            <TableColumn fx:id="ip" prefWidth="75.0" text="IP Address" />
-                              <TableColumn fx:id="cible" prefWidth="215.0" text="Cible" />
-                              <TableColumn fx:id="heur" prefWidth="216.0" text="Date et Heure" />
-                              <TableColumn fx:id="operation" prefWidth="75.0" text="Operation" />
-                              <TableColumn fx:id="userId" prefWidth="75.0" text="Utilisateur" />
+                            <TableColumn fx:id="id" prefWidth="41.66666793823242" text="ID" />
+                            <TableColumn fx:id="ip" prefWidth="172.3333282470703" text="IP Address" />
+                              <TableColumn fx:id="cible" prefWidth="122.66667175292969" text="Cible" />
+                              <TableColumn fx:id="heur" prefWidth="125.0" text="Date " />
+                              <TableColumn fx:id="operation" prefWidth="207.33334350585938" text="Operation" />
+                              <TableColumn fx:id="userId" prefWidth="112.0" text="User" />
                           </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
                         </TableView>
                         <ButtonBar layoutX="176.0" layoutY="519.0" prefHeight="40.0" prefWidth="390.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="176.0">
                           <buttons>
@@ -38,7 +35,7 @@
                               <Button mnemonicParsing="false" onAction="#handleDeleteAllClick" text="Tout supprimer" />
                           </buttons>
                         </ButtonBar>
-                        <TextField fx:id="recherche" layoutX="606.0" layoutY="523.0" onKeyReleased="#handleReleasedClick" prefHeight="25.0" prefWidth="200.0" promptText="Search" style="-fx-border-color: #000; -fx-prompt-text-fill: #000;" AnchorPane.bottomAnchor="15.0" />
+                        <TextField fx:id="recherche" layoutX="586.0" layoutY="529.0" onKeyReleased="#handleReleasedClick" prefHeight="25.0" prefWidth="200.0" promptText="Search" style="-fx-border-color: #000; -fx-prompt-text-fill: #000;" AnchorPane.bottomAnchor="15.0" />
                         <Button layoutX="822.0" layoutY="521.0" mnemonicParsing="false" onAction="#handlePrintClick" prefHeight="25.0" prefWidth="115.0" text="Imprimer" AnchorPane.bottomAnchor="15.0" />
                         <Label alignment="CENTER" layoutX="9.0" layoutY="6.0" prefHeight="33.0" prefWidth="1278.0" style="-fx-text-fill: #000;" text="                              Trace des opérations effectuées au sein du système                 " textAlignment="CENTER" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="6.0">
                            <font>
@@ -56,16 +53,13 @@
                      <children>
                         <TableView fx:id="operationTab1" editable="true" layoutX="9.0" layoutY="78.0" prefHeight="456.0" prefWidth="1279.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="51.0">
                            <columns>
-                              <TableColumn fx:id="id1" prefWidth="75.0" text="Id operation" />
-                              <TableColumn fx:id="ip1" prefWidth="75.0" text="IP Address" />
-                              <TableColumn fx:id="cible1" prefWidth="215.0" text="Cible" />
-                              <TableColumn fx:id="heur1" prefWidth="216.0" text="Date et Heure" />
-                              <TableColumn fx:id="operation1" prefWidth="75.0" text="Operation" />
-                              <TableColumn fx:id="userId1" prefWidth="75.0" text="Utilisateur" />
+                              <TableColumn fx:id="id1" prefWidth="40.0" text="ID" />
+                              <TableColumn fx:id="ip1" prefWidth="141.6666717529297" text="IP Address" />
+                              <TableColumn fx:id="cible1" prefWidth="139.66668701171875" text="Cible" />
+                              <TableColumn fx:id="heur1" prefWidth="151.33334350585938" text="Date " />
+                              <TableColumn fx:id="operation1" prefWidth="209.3333740234375" text="Operation" />
+                              <TableColumn fx:id="userId1" prefWidth="160.6666259765625" text="User" />
                            </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
                         </TableView>
                         <ButtonBar layoutX="176.0" layoutY="519.0" prefHeight="40.0" prefWidth="390.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="176.0">
                            <buttons>

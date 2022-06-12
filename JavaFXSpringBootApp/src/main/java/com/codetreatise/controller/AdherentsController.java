@@ -1,8 +1,6 @@
 package com.codetreatise.controller;
 
-import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
@@ -53,7 +51,7 @@ public class AdherentsController implements Initializable {
 	@FXML
 	private Label adherentPrenomLabel;
 	@FXML
-	private Label AdherentDateNaissLabel;
+	private Label cniLabel;
 	@FXML
 	private Label adherentFonctionLabel;
 	@FXML
@@ -122,33 +120,8 @@ public class AdherentsController implements Initializable {
 
 	// Event Listener on Button.onAction
 	@FXML
-	public void handleDeleteClick(ActionEvent event) throws UnknownHostException, ClassNotFoundException, IOException {
-		Adherent selectedAdherent = adherentTable.getSelectionModel().getSelectedItem();
-		if (selectedAdherent != null) {
-			if (MethodUtilitaire.confirmationDialog(selectedAdherent, "Supprimer l'adhérent",
-					"Un adhérent sera supprimer",
-					"Supprimer l'adhérent " + selectedAdherent.getNom() + " " + selectedAdherent.getPrenom())) {
-				adherentTable.getItems().remove(selectedAdherent);
-				adherentRepository.delete(selectedAdherent);
-				MethodUtilitaire.saveAlert(selectedAdherent, "Suppression de l'adhérent réussi", "L'adhérent "
-						+ selectedAdherent.getNom() + " " + selectedAdherent.getPrenom() + " à été supprimer !");
-				methodUtilitaire
-						.LogFile(
-								"Suppression d'un adherent", selectedAdherent.getIdentifiant() + "-"
-										+ selectedAdherent.getNom() + " " + selectedAdherent.getPrenom(),
-								MethodUtilitaire.deserializationUser());
-			}
-
-		} else {
-			MethodUtilitaire.deleteNoPersonSelectedAlert("Aucun adhérent sélectionné", "Aucun adhérent sélectionné",
-					"Sélectionné un adhérent puis essayer de nouveau");
-		}
-	}
-
-	// Event Listener on Button.onAction
-	@FXML
 	public void handleAdvancedClick(ActionEvent event) {
-		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.MANAGEADHERENT);
+		stageManager.switchSceneShowPreviousStage(FxmlView.MANAGEADHERENT);
 	}
 
 	private void filteredTable(KeyEvent event) {
@@ -225,7 +198,7 @@ public class AdherentsController implements Initializable {
 			adherentLieuNaissLabel.setText(adherent.getLieuNaiss());
 			adherentNomLael.setText(adherent.getNom());
 			adherentPrenomLabel.setText(adherent.getPrenom());
-			AdherentDateNaissLabel.setText(adherent.getDateNaiss().toString());
+			cniLabel.setText(adherent.getCni());
 			adherentFonctionLabel.setText(adherent.getFonction());
 			adherentStatutLabel.setText(adherent.getSituation());
 			if(adherent.getSituation().equals("Actif")) {
@@ -239,7 +212,7 @@ public class AdherentsController implements Initializable {
 			// Person is null, remove all the text.
 			adherentNomLael.setText("");
 			adherentPrenomLabel.setText("");
-			AdherentDateNaissLabel.setText("");
+			cniLabel.setText("");
 			adherentFonctionLabel.setText("");
 			adherentStatutLabel.setText("");
 			adherentLieuNaissLabel.setText("");

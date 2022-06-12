@@ -35,8 +35,7 @@ public class Adherent implements Serializable{
 	private String nom;
 	private String prenom;
 	private String lieuNaiss;
-	@Temporal(TemporalType.DATE)
-	private Date dateNaiss;
+	private String cni;
 	private String type;
 	private String situation;
 	private String fonction;
@@ -65,11 +64,11 @@ public class Adherent implements Serializable{
 	public void setLieuNaiss(String lieuNaiss) {
 		this.lieuNaiss = lieuNaiss;
 	}
-	public Date getDateNaiss() {
-		return dateNaiss;
+	public String getCni() {
+		return cni;
 	}
-	public void setDateNaiss(Date date) {
-		this.dateNaiss = date;
+	public void setCni(String cni) {
+		this.cni = cni;
 	}
 	public String getType() {
 		return type;

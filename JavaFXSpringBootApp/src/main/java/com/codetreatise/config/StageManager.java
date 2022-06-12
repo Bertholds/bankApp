@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -24,61 +25,64 @@ import javafx.stage.WindowEvent;
  */
 public class StageManager {
 
-    private static final Logger LOG = getLogger(StageManager.class);
-    private Stage primaryStage;
-    private Stage newPrimaryStage;
-    private final SpringFXMLLoader springFXMLLoader;
-    
-    @Autowired
+	private static final Logger LOG = getLogger(StageManager.class);
+	private Stage primaryStage;
+	private Stage newPrimaryStage;
+	private final SpringFXMLLoader springFXMLLoader;
+
+	@Autowired
 	private AdherentsController adherentsController;
 
-    public StageManager(SpringFXMLLoader springFXMLLoader, Stage stage) {
-        this.springFXMLLoader = springFXMLLoader;
-        this.primaryStage = stage;
-    }
+	public StageManager(SpringFXMLLoader springFXMLLoader, Stage stage) {
+		this.springFXMLLoader = springFXMLLoader;
+		this.primaryStage = stage;
+	}
 
-    public void switchScene(final FxmlView view) {
-        Parent viewRootNodeHierarchy = loadViewNodeHierarchy(view.getFxmlFile());
-        show(viewRootNodeHierarchy, view.getTitle());
-    }
-    
-    public Stage switchSceneShowPreviousStage(final FxmlView view) {
+	public void switchScene(final FxmlView view) {
+		Parent viewRootNodeHierarchy = loadViewNodeHierarchy(view.getFxmlFile());
+		show(viewRootNodeHierarchy, view.getTitle());
+	}
+
+	public Stage switchSceneShowPreviousStage(final FxmlView view) {
 		Parent viewRootNodeHierarchy = loadViewNodeHierarchy(view.getFxmlFile());
 		return showPreviousStage(viewRootNodeHierarchy, view.getTitle());
 	}
-    
-    public void switchSceneShowPreviousStageInitOwner(final FxmlView view) {
+
+	public void switchSceneShowPreviousStageInitOwner(final FxmlView view) {
 		Parent viewRootNodeHierarchy = loadViewNodeHierarchy(view.getFxmlFile());
 		showPreviousStageInitOwner(viewRootNodeHierarchy, view.getTitle());
 	}
-    private void show(final Parent rootnode, String title) {
-        Scene scene = prepareScene(rootnode);
-        //scene.getStylesheets().add("/styles/Styles.css");
-        
-        //primaryStage.initStyle(StageStyle.TRANSPARENT);
-        primaryStage.setTitle(title);
-        primaryStage.setScene(scene);
-        primaryStage.sizeToScene();
-        primaryStage.centerOnScreen();
-        
-        try {
-            primaryStage.show();
-        } catch (Exception exception) {
-            logAndExit ("Unable to show scene for title" + title,  exception);
-        }
-    }
-    
-    private Scene prepareScene(Parent rootnode){
-        Scene scene = primaryStage.getScene();
 
-        if (scene == null) {
-            scene = new Scene(rootnode);
-        }
-        scene.setRoot(rootnode);
-        return scene;
-    }
-private Scene prepareSceneShowPreviousScene(Parent rootnode) {
-		
+	private void show(final Parent rootnode, String title) {
+		Scene scene = prepareScene(rootnode);
+		// scene.getStylesheets().add("/styles/Styles.css");
+
+		// primaryStage.initStyle(StageStyle.TRANSPARENT);
+		primaryStage.setTitle(title);
+		primaryStage.setScene(scene);
+		primaryStage.sizeToScene();
+		primaryStage.centerOnScreen();
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/fav-icon.png")));
+
+		try {
+			primaryStage.show();
+		} catch (Exception exception) {
+			logAndExit("Unable to show scene for title" + title, exception);
+		}
+	}
+
+	private Scene prepareScene(Parent rootnode) {
+		Scene scene = primaryStage.getScene();
+
+		if (scene == null) {
+			scene = new Scene(rootnode);
+		}
+		scene.setRoot(rootnode);
+		return scene;
+	}
+
+	private Scene prepareSceneShowPreviousScene(Parent rootnode) {
+
 		Scene scene = new Scene(rootnode);
 		System.out.println("numero 1");
 		return scene;
@@ -93,14 +97,15 @@ private Scene prepareSceneShowPreviousScene(Parent rootnode) {
 		newPrimaryStage.setTitle(title);
 		newPrimaryStage.setScene(scene);
 		newPrimaryStage.sizeToScene();
-		newPrimaryStage.setX(primaryStage.getX() + 259); 
+		newPrimaryStage.setX(primaryStage.getX() + 255);
 		newPrimaryStage.setY(primaryStage.getY() + 58);
 		newPrimaryStage.initModality(Modality.WINDOW_MODAL);
-		//newPrimaryStage.toFront();
-		//primaryStage.initOwner(this.primaryStage);
+		newPrimaryStage.toFront();
+		newPrimaryStage.initOwner(this.primaryStage);
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/fav-icon.png")));
 
 		try {
-			newPrimaryStage.initStyle(StageStyle.TRANSPARENT);
+			newPrimaryStage.initStyle(StageStyle.UTILITY);
 			newPrimaryStage.show();
 		} catch (Exception exception) {
 			logAndExit("Unable to show scene for title" + title, exception);
@@ -108,55 +113,56 @@ private Scene prepareSceneShowPreviousScene(Parent rootnode) {
 		return newPrimaryStage;
 	}
 
-  //this method permit to define owner on stage dialog
-  	private void showPreviousStageInitOwner(final Parent rootnode, String title) {
-  		Scene scene = prepareSceneShowPreviousScene(rootnode);
-  		// scene.getStylesheets().add("/styles/Styles.css");
+	// this method permit to define owner on stage dialog
+	private void showPreviousStageInitOwner(final Parent rootnode, String title) {
+		Scene scene = prepareSceneShowPreviousScene(rootnode);
+		// scene.getStylesheets().add("/styles/Styles.css");
 
-  		// primaryStage.initStyle(StageStyle.TRANSPARENT);
-  	    Stage  primaryStage = new Stage();
-  	    primaryStage.setTitle(title);
-  	    primaryStage.setScene(scene);
-  	    primaryStage.sizeToScene();
-  	    primaryStage.centerOnScreen();
-  	    primaryStage.initModality(Modality.APPLICATION_MODAL);
-  	    primaryStage.initOwner(this.primaryStage);
-  	    primaryStage.setResizable(false);
-  	    primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			
+		// primaryStage.initStyle(StageStyle.TRANSPARENT);
+		Stage primaryStage = new Stage();
+		primaryStage.setTitle(title);
+		primaryStage.setScene(scene);
+		primaryStage.sizeToScene();
+		primaryStage.centerOnScreen();
+		primaryStage.initModality(Modality.APPLICATION_MODAL);
+		primaryStage.initOwner(this.primaryStage);
+		primaryStage.setResizable(false);
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/fav-icon.png")));
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
 			@Override
 			public void handle(WindowEvent arg0) {
 				adherentsController.setIsEditButtonClick(false);
 			}
 		});
 
-  		try {
-  			primaryStage.show();
-  		} catch (Exception exception) {
-  			logAndExit("Unable to show scene for title" + title, exception);
-  		}
-  	}
-    /**
-     * Loads the object hierarchy from a FXML document and returns to root node
-     * of that hierarchy.
-     *
-     * @return Parent root node of the FXML document hierarchy
-     */
-    private Parent loadViewNodeHierarchy(String fxmlFilePath) {
-        Parent rootNode = null;
-        try {
-            rootNode = springFXMLLoader.load(fxmlFilePath);
-            Objects.requireNonNull(rootNode, "A Root FXML node must not be null");
-        } catch (Exception exception) {
-            logAndExit("Unable to load FXML view" + fxmlFilePath, exception);
-        }
-        return rootNode;
-    }
-    
-    
-    private void logAndExit(String errorMsg, Exception exception) {
-        LOG.error(errorMsg, exception, exception.getCause());
-        Platform.exit();
-    }
+		try {
+			primaryStage.show();
+		} catch (Exception exception) {
+			logAndExit("Unable to show scene for title" + title, exception);
+		}
+	}
+
+	/**
+	 * Loads the object hierarchy from a FXML document and returns to root node of
+	 * that hierarchy.
+	 *
+	 * @return Parent root node of the FXML document hierarchy
+	 */
+	private Parent loadViewNodeHierarchy(String fxmlFilePath) {
+		Parent rootNode = null;
+		try {
+			rootNode = springFXMLLoader.load(fxmlFilePath);
+			Objects.requireNonNull(rootNode, "A Root FXML node must not be null");
+		} catch (Exception exception) {
+			logAndExit("Unable to load FXML view" + fxmlFilePath, exception);
+		}
+		return rootNode;
+	}
+
+	private void logAndExit(String errorMsg, Exception exception) {
+		LOG.error(errorMsg, exception, exception.getCause());
+		Platform.exit();
+	}
 
 }

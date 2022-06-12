@@ -4,12 +4,15 @@
 package com.codetreatise.bean;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * @author Chrispin
@@ -35,20 +38,29 @@ public class CompteEpargne implements Serializable{
 	@Column(updatable=false, nullable=false)
 	private Long epargneId;
 	
-	private float solde;
-	private float fond;
-	private float lacarte;
+	private Long solde;
+	private Long fond;
+	private Long lacarte;
 	private boolean avaliser;
 	private String statut;
+	
+	@Temporal(TemporalType.DATE)
+	private Date dateCreation;
 	
 	@OneToOne
 	private Adherent adherent;
 
-	public float getSolde() {
+	@OneToOne
+	private CompteTampon compteTampon;
+	
+	@OneToOne
+	private CompteCreance compteCreance;
+	
+	public Long getSolde() {
 		return solde;
 	}
 
-	public void setSolde(float solde) {
+	public void setSolde(Long solde) {
 		this.solde = solde;
 	}
 
@@ -71,27 +83,44 @@ public class CompteEpargne implements Serializable{
 	public Long getEpargneId() {
 		return epargneId;
 	}
+	
+	public CompteTampon getCompteTampon() {
+		return compteTampon;
+	}
+
+	public void setCompteTampon(CompteTampon compteTampon) {
+		this.compteTampon = compteTampon;
+	}
+
+	public CompteCreance getCompteCreance() {
+		return compteCreance;
+	}
+
+	public void setCompteCreance(CompteCreance compteCreance) {
+		this.compteCreance = compteCreance;
+	}
+
 	public void setEpargneId(Long id) {
 		this.epargneId = id;
 	}
-	public void setFond(float fond) {
+	public void setFond(Long fond) {
 		this.fond = fond;
 	}
-	public float getFond() {
+	public Long getFond() {
 		return fond;
 	}
 
 	/**
 	 * @return the lacarte
 	 */
-	public float getLacarte() {
+	public Long getLacarte() {
 		return lacarte;
 	}
 
 	/**
 	 * @param lacarte the lacarte to set
 	 */
-	public void setLacarte(float lacarte) {
+	public void setLacarte(Long lacarte) {
 		this.lacarte = lacarte;
 	}
 
@@ -101,6 +130,14 @@ public class CompteEpargne implements Serializable{
 
 	public void setStatut(String statut) {
 		this.statut = statut;
+	}
+
+	public Date getDateCreation() {
+		return dateCreation;
+	}
+
+	public void setDateCreation(Date dateCreation) {
+		this.dateCreation = dateCreation;
 	}
 	
 

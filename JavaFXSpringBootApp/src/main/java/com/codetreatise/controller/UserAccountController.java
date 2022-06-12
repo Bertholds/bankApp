@@ -1,6 +1,7 @@
 package com.codetreatise.controller;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
@@ -69,8 +70,6 @@ public class UserAccountController implements Initializable {
 	@FXML
 	private TableColumn<CompteUtilisateur, String> pseudoTableColumn;
 	@FXML
-	private TableColumn<CompteUtilisateur, String> loginTableColumn;
-	@FXML
 	private TableColumn<CompteUtilisateur, String> accesTableColumn;
 	@FXML
 	private TableColumn<CompteUtilisateur, Boolean> editTableColumn;
@@ -137,19 +136,22 @@ public class UserAccountController implements Initializable {
 				compteUtilisateur.setNiveau_access(getDroit());
 				compteUtilisateur.setLogin(getLogin());
 				compteUtilisateur.setPass(getPass());
-				
+
 				CompteUtilisateur newCompteUtilisateur = userAccountRepository.save(compteUtilisateur);
-				MethodUtilitaire.saveAlert(newCompteUtilisateur, "Save User account sucessful", "User account with pseudo "
-						+ newCompteUtilisateur.getUtilisateur().getPseudo() + " create successful");
+				MethodUtilitaire.saveAlert(newCompteUtilisateur, "Save User account sucessful",
+						"User account with pseudo " + newCompteUtilisateur.getUtilisateur().getPseudo()
+								+ " create successful");
 
 				clearFields();
 				loadDataOnTable();
 
 				methodUtilitaire.LogFile("Creation de compte utilisateur",
-						newCompteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser());
+						newCompteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser(),
+						new Date(System.currentTimeMillis()));
 			} catch (Exception e) {
 				e.printStackTrace();
-				MethodUtilitaire.deleteNoPersonSelectedAlert("Erreur pseudo inconnu", "Erreur pseudo inconnu", "Le pseudo ne correspond à aucun utilisateur");
+				MethodUtilitaire.deleteNoPersonSelectedAlert("Erreur pseudo inconnu", "Erreur pseudo inconnu",
+						"Le pseudo ne correspond à aucun utilisateur");
 			}
 
 		}
@@ -160,14 +162,16 @@ public class UserAccountController implements Initializable {
 	public void handleDeleteClick(ActionEvent event) throws Exception {
 		List<CompteUtilisateur> usersAccount = utilisateurAccountTable.getSelectionModel().getSelectedItems();
 		if (!usersAccount.isEmpty()) {
-			if (MethodUtilitaire.confirmationDialog(event, "Confirm to delete selected user account ?",
-					"Confirm to delete selected user account ?", "")) {
+			if (MethodUtilitaire.confirmationDialog(event, "Confirmer la suppression ?",
+					"Confirmer la suppression de compte(s) utilisateur(s) sélectionné(s)",
+					"Etes vous sur de vouloir le(s) supprimé(s) ?", "Oui", "Annuler")) {
 				userAccountRepository.deleteInBatch(usersAccount);
 				loadDataOnTable();
 				MethodUtilitaire.saveAlert(event, "Delete operation successful", "Delete operation successful");
 				for (CompteUtilisateur compteUtilisateur : usersAccount) {
 					methodUtilitaire.LogFile("Suppression de compte utilisateur",
-							compteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser());
+							compteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser(),
+							new Date(System.currentTimeMillis()));
 				}
 			}
 		} else {
@@ -200,7 +204,8 @@ public class UserAccountController implements Initializable {
 				loadDataOnTable();
 				enableBtn();
 				methodUtilitaire.LogFile("Edition de compte utilisateur",
-						compteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser());
+						compteUtilisateur.getUtilisateur().getPseudo(), MethodUtilitaire.deserializationUser(),
+						new Date(System.currentTimeMillis()));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -215,7 +220,7 @@ public class UserAccountController implements Initializable {
 		Node node = (Node) event.getSource();
 		Stage stage = (Stage) node.getScene().getWindow();
 		stage.close();
-		stageManager.switchSceneShowPreviousStageInitOwner(FxmlView.USER);
+		stageManager.switchSceneShowPreviousStage(FxmlView.USER);
 	}
 
 	// Event Listener on TextField[#search].onKeyReleased
@@ -290,7 +295,6 @@ public class UserAccountController implements Initializable {
 
 	private void setColumProperties() {
 		accesTableColumn.setCellValueFactory(new PropertyValueFactory<>("niveau_access"));
-		loginTableColumn.setCellValueFactory(new PropertyValueFactory<>("login"));
 		IdTableColumn.setCellValueFactory(
 				new Callback<TableColumn.CellDataFeatures<CompteUtilisateur, String>, ObservableValue<String>>() {
 
@@ -316,7 +320,7 @@ public class UserAccountController implements Initializable {
 		public TableCell<CompteUtilisateur, Boolean> call(final TableColumn<CompteUtilisateur, Boolean> param) {
 			final TableCell<CompteUtilisateur, Boolean> cell = new TableCell<CompteUtilisateur, Boolean>() {
 				Image imgEdit = new Image(getClass().getResourceAsStream("/images/edit.png"));
-				final Button btnEdit = new Button("Editer");
+				final Button btnEdit = new Button();
 
 				@Override
 				public void updateItem(Boolean check, boolean empty) {
