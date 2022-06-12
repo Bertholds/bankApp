@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<project name="JavaFXSpringBootApp" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<target name="init-fx-tasks">
+		<path id="fxant">
+			<filelist>
+				<file name="${java.home}\..\lib\ant-javafx.jar"/>
+				<file name="${java.home}\lib\jfxrt.jar"/>
+				<file name="${basedir}"/>
+			</filelist>
+		</path>
+	
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpathref="fxant"/>
+	</target>
+	<target name="setup-staging-area">
+		<delete dir="externalLibs" />
+		<delete dir="project" />
+		<delete dir="projectRefs" />
+	
+		<mkdir dir="externalLibs" />
+	
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-context\4.3.7.RELEASE">
+				<filename name="spring-context-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\net\minidev\accessors-smart\1.1">
+				<filename name="accessors-smart-1.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\bouncycastle\bcprov-jdk15on\1.68">
+				<filename name="bcprov-jdk15on-1.68.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\git\repositoryNew\JavaFXSpringBootApp\libs">
+				<filename name="fontawesomefx-glyphsbrowser-all-1.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\lowagie\itext\2.1.7.js9">
+				<filename name="itext-2.1.7.js9.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\javax\inject\javax.inject\1">
+				<filename name="javax.inject-1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\security\spring-security-config\4.2.2.RELEASE">
+				<filename name="spring-security-config-4.2.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\tomcat\tomcat-juli\8.5.11">
+				<filename name="tomcat-juli-8.5.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-aop\4.3.7.RELEASE">
+				<filename name="spring-aop-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\commons\commons-lang3\3.4">
+				<filename name="commons-lang3-3.4.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-core\4.3.7.RELEASE">
+				<filename name="spring-core-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-security\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-security-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-cache\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-cache-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-expression\4.3.7.RELEASE">
+				<filename name="spring-expression-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-logging\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-logging-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\skyscreamer\jsonassert\1.4.0">
+				<filename name="jsonassert-1.4.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\commons-logging\commons-logging\1.1.1">
+				<filename name="commons-logging-1.1.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\eclipse\jdt\ecj\3.21.0">
+				<filename name="ecj-3.21.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\net\sf\jasperreports\jasperreports\6.18.1">
+				<filename name="jasperreports-6.18.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.8.7">
+				<filename name="jackson-databind-2.8.7.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\dom4j\dom4j\1.6.1">
+				<filename name="dom4j-1.6.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\slf4j\jul-to-slf4j\1.7.24">
+				<filename name="jul-to-slf4j-1.7.24.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\mockito\mockito-core\1.10.19">
+				<filename name="mockito-core-1.10.19.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\commons\commons-pool2\2.4.2">
+				<filename name="commons-pool2-2.4.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-tx\4.3.7.RELEASE">
+				<filename name="spring-tx-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\commons-digester\commons-digester\2.1">
+				<filename name="commons-digester-2.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hibernate\javax\persistence\hibernate-jpa-2.1-api\1.0.0.Final">
+				<filename name="hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\net\minidev\json-smart\2.2.1">
+				<filename name="json-smart-2.2.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\ow2\asm\asm\5.0.3">
+				<filename name="asm-5.0.3.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hamcrest\hamcrest-core\1.3">
+				<filename name="hamcrest-core-1.3.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\slf4j\jcl-over-slf4j\1.7.24">
+				<filename name="jcl-over-slf4j-1.7.24.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-aop\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-aop-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot\1.5.2.RELEASE">
+				<filename name="spring-boot-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-beans\4.3.7.RELEASE">
+				<filename name="spring-beans-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-jdbc\4.3.7.RELEASE">
+				<filename name="spring-jdbc-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\antlr\antlr\2.7.7">
+				<filename name="antlr-2.7.7.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hibernate\common\hibernate-commons-annotations\5.0.1.Final">
+				<filename name="hibernate-commons-annotations-5.0.1.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\commons-collections\commons-collections\3.2.2">
+				<filename name="commons-collections-3.2.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\objenesis\objenesis\2.1">
+				<filename name="objenesis-2.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\jfree\jcommon\1.0.23">
+				<filename name="jcommon-1.0.23.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hibernate\hibernate-entitymanager\5.0.12.Final">
+				<filename name="hibernate-entitymanager-5.0.12.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-context-support\4.3.7.RELEASE">
+				<filename name="spring-context-support-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\junit\junit\4.12">
+				<filename name="junit-4.12.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-aspects\4.3.7.RELEASE">
+				<filename name="spring-aspects-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\javax\transaction\javax.transaction-api\1.2">
+				<filename name="javax.transaction-api-1.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\google\protobuf\protobuf-java\3.11.4">
+				<filename name="protobuf-java-3.11.4.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hibernate\hibernate-core\5.0.12.Final">
+				<filename name="hibernate-core-5.0.12.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\commons\commons-dbcp2\2.8.0">
+				<filename name="commons-dbcp2-2.8.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.8.7">
+				<filename name="jackson-core-2.8.7.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\jfree\jfreechart\1.0.19">
+				<filename name="jfreechart-1.0.19.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1">
+				<filename name="android-json-0.0.20131108.vaadin1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\data\spring-data-commons\1.13.1.RELEASE">
+				<filename name="spring-data-commons-1.13.1.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\1.5.2.RELEASE">
+				<filename name="spring-boot-autoconfigure-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\security\spring-security-web\4.2.2.RELEASE">
+				<filename name="spring-security-web-4.2.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\javassist\javassist\3.21.0-GA">
+				<filename name="javassist-3.21.0-GA.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\aspectj\aspectjweaver\1.8.9">
+				<filename name="aspectjweaver-1.8.9.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-web\4.3.7.RELEASE">
+				<filename name="spring-web-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\jboss\logging\jboss-logging\3.3.0.Final">
+				<filename name="jboss-logging-3.3.0.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\codehaus\castor\castor-xml\1.4.1">
+				<filename name="castor-xml-1.4.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\mysql\mysql-connector-java\8.0.28">
+				<filename name="mysql-connector-java-8.0.28.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\commons-beanutils\commons-beanutils\1.9.3">
+				<filename name="commons-beanutils-1.9.3.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\hamcrest\hamcrest-library\1.3">
+				<filename name="hamcrest-library-1.3.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.8.0">
+				<filename name="jackson-annotations-2.8.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\ch\qos\logback\logback-classic\1.1.11">
+				<filename name="logback-classic-1.1.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\security\spring-security-core\4.2.2.RELEASE">
+				<filename name="spring-security-core-4.2.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\slf4j\slf4j-api\1.7.24">
+				<filename name="slf4j-api-1.7.24.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-test\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-test-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-test\4.3.7.RELEASE">
+				<filename name="spring-test-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\jboss\jandex\2.0.0.Final">
+				<filename name="jandex-2.0.0.Final.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-data-jpa-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\com\jayway\jsonpath\json-path\2.2.0">
+				<filename name="json-path-2.2.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\commons\commons-collections4\4.2">
+				<filename name="commons-collections4-4.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\slf4j\log4j-over-slf4j\1.7.24">
+				<filename name="log4j-over-slf4j-1.7.24.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\apache\tomcat\tomcat-jdbc\8.5.11">
+				<filename name="tomcat-jdbc-8.5.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\codehaus\castor\castor-core\1.4.1">
+				<filename name="castor-core-1.4.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-test\1.5.2.RELEASE">
+				<filename name="spring-boot-test-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\ch\qos\logback\logback-core\1.1.11">
+				<filename name="logback-core-1.1.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\yaml\snakeyaml\1.17">
+				<filename name="snakeyaml-1.17.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\data\spring-data-jpa\1.11.1.RELEASE">
+				<filename name="spring-data-jpa-1.11.1.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\spring-orm\4.3.7.RELEASE">
+				<filename name="spring-orm-4.3.7.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\1.5.2.RELEASE">
+				<filename name="spring-boot-test-autoconfigure-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\1.5.2.RELEASE">
+				<filename name="spring-boot-starter-jdbc-1.5.2.RELEASE.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\bk\.m2\repository\org\assertj\assertj-core\2.6.0">
+				<filename name="assertj-core-2.6.0.jar"/>
+			</fileset>
+		</copy>
+	
+		<mkdir dir="project" />
+		<copy todir="project">
+			<fileset dir="C:\Users\bk\git\repositoryNew\JavaFXSpringBootApp">
+				<include name="src\main\resources/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\bk\git\repositoryNew\JavaFXSpringBootApp">
+				<include name="libs/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\bk\git\repositoryNew\JavaFXSpringBootApp">
+				<include name="src\test\java/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\bk\git\repositoryNew\JavaFXSpringBootApp">
+				<include name="src\main\java/**" />
+			</fileset>
+		</copy>
+	
+		<mkdir dir="projectRefs" />
+	</target>
+	<target name='do-compile'>
+		<delete dir="build" />
+		<mkdir dir="build/src" />
+		<mkdir dir="build/libs" />
+		<mkdir dir="build/classes" />
+	
+		<!-- Copy project-libs references -->
+		<copy todir="build/libs">
+			<fileset dir="externalLibs">
+				<include name="spring-tx-4.3.7.RELEASE.jar"/>
+				<include name="snakeyaml-1.17.jar"/>
+				<include name="commons-digester-2.1.jar"/>
+				<include name="spring-boot-1.5.2.RELEASE.jar"/>
+				<include name="jboss-logging-3.3.0.Final.jar"/>
+				<include name="spring-boot-starter-logging-1.5.2.RELEASE.jar"/>
+				<include name="spring-security-core-4.2.2.RELEASE.jar"/>
+				<include name="ecj-3.21.0.jar"/>
+				<include name="spring-boot-starter-cache-1.5.2.RELEASE.jar"/>
+				<include name="jandex-2.0.0.Final.jar"/>
+				<include name="tomcat-juli-8.5.11.jar"/>
+				<include name="spring-aop-4.3.7.RELEASE.jar"/>
+				<include name="dom4j-1.6.1.jar"/>
+				<include name="bcprov-jdk15on-1.68.jar"/>
+				<include name="spring-beans-4.3.7.RELEASE.jar"/>
+				<include name="jsonassert-1.4.0.jar"/>
+				<include name="spring-data-jpa-1.11.1.RELEASE.jar"/>
+				<include name="castor-xml-1.4.1.jar"/>
+				<include name="objenesis-2.1.jar"/>
+				<include name="spring-expression-4.3.7.RELEASE.jar"/>
+				<include name="spring-boot-starter-test-1.5.2.RELEASE.jar"/>
+				<include name="spring-boot-starter-security-1.5.2.RELEASE.jar"/>
+				<include name="aspectjweaver-1.8.9.jar"/>
+				<include name="commons-pool2-2.4.2.jar"/>
+				<include name="commons-collections-3.2.2.jar"/>
+				<include name="json-smart-2.2.1.jar"/>
+				<include name="jcommon-1.0.23.jar"/>
+				<include name="commons-lang3-3.4.jar"/>
+				<include name="log4j-over-slf4j-1.7.24.jar"/>
+				<include name="jfreechart-1.0.19.jar"/>
+				<include name="json-path-2.2.0.jar"/>
+				<include name="hibernate-commons-annotations-5.0.1.Final.jar"/>
+				<include name="spring-jdbc-4.3.7.RELEASE.jar"/>
+				<include name="spring-core-4.3.7.RELEASE.jar"/>
+				<include name="spring-security-web-4.2.2.RELEASE.jar"/>
+				<include name="castor-core-1.4.1.jar"/>
+				<include name="spring-boot-autoconfigure-1.5.2.RELEASE.jar"/>
+				<include name="tomcat-jdbc-8.5.11.jar"/>
+				<include name="spring-context-4.3.7.RELEASE.jar"/>
+				<include name="fontawesomefx-glyphsbrowser-all-1.0.jar"/>
+				<include name="spring-orm-4.3.7.RELEASE.jar"/>
+				<include name="hibernate-core-5.0.12.Final.jar"/>
+				<include name="jackson-core-2.8.7.jar"/>
+				<include name="hamcrest-core-1.3.jar"/>
+				<include name="javax.inject-1.jar"/>
+				<include name="mockito-core-1.10.19.jar"/>
+				<include name="mysql-connector-java-8.0.28.jar"/>
+				<include name="commons-dbcp2-2.8.0.jar"/>
+				<include name="logback-classic-1.1.11.jar"/>
+				<include name="javassist-3.21.0-GA.jar"/>
+				<include name="accessors-smart-1.1.jar"/>
+				<include name="commons-logging-1.1.1.jar"/>
+				<include name="hamcrest-library-1.3.jar"/>
+				<include name="slf4j-api-1.7.24.jar"/>
+				<include name="jackson-databind-2.8.7.jar"/>
+				<include name="jasperreports-6.18.1.jar"/>
+				<include name="jcl-over-slf4j-1.7.24.jar"/>
+				<include name="spring-boot-starter-1.5.2.RELEASE.jar"/>
+				<include name="android-json-0.0.20131108.vaadin1.jar"/>
+				<include name="spring-test-4.3.7.RELEASE.jar"/>
+				<include name="hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+				<include name="spring-security-config-4.2.2.RELEASE.jar"/>
+				<include name="assertj-core-2.6.0.jar"/>
+				<include name="spring-web-4.3.7.RELEASE.jar"/>
+				<include name="spring-aspects-4.3.7.RELEASE.jar"/>
+				<include name="commons-collections4-4.2.jar"/>
+				<include name="itext-2.1.7.js9.jar"/>
+				<include name="spring-boot-starter-jdbc-1.5.2.RELEASE.jar"/>
+				<include name="commons-beanutils-1.9.3.jar"/>
+				<include name="spring-data-commons-1.13.1.RELEASE.jar"/>
+				<include name="spring-context-support-4.3.7.RELEASE.jar"/>
+				<include name="jul-to-slf4j-1.7.24.jar"/>
+				<include name="spring-boot-starter-data-jpa-1.5.2.RELEASE.jar"/>
+				<include name="logback-core-1.1.11.jar"/>
+				<include name="spring-boot-test-autoconfigure-1.5.2.RELEASE.jar"/>
+				<include name="hibernate-entitymanager-5.0.12.Final.jar"/>
+				<include name="spring-boot-starter-aop-1.5.2.RELEASE.jar"/>
+				<include name="javax.transaction-api-1.2.jar"/>
+				<include name="antlr-2.7.7.jar"/>
+				<include name="asm-5.0.3.jar"/>
+				<include name="spring-boot-test-1.5.2.RELEASE.jar"/>
+				<include name="protobuf-java-3.11.4.jar"/>
+				<include name="jackson-annotations-2.8.0.jar"/>
+				<include name="junit-4.12.jar"/>
+			</fileset>
+		</copy>
+	
+		<!-- Copy project references -->
+	
+		<!-- Copy project sources itself -->
+		<copy todir="build/src">
+			<fileset dir="project/src/test/java">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<!--
+		<copy todir="build/src">
+			<fileset dir="project/src/main/resources">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		-->
+		<copy todir="build/src">
+			<fileset dir="project/src/main/java">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/libs">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+	
+		<javac includeantruntime="false" source="1.8" target="1.8" srcdir="build/src" destdir="build/classes" encoding="UTF-8">
+			<classpath>
+				<fileset dir="build/libs">
+					<include name="*"/>
+				</fileset>
+			</classpath>
+		</javac>
+	
+		<!-- Copy over none Java-Files -->
+		<copy todir="build/classes">
+		<fileset dir="project/src/test/java">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/src/main/resources">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/src/main/java">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/libs">
+			<exclude name="**/*.java"/>
+		</fileset>
+		</copy>
+	
+	
+	</target>
+	<target name="do-deploy" depends="setup-staging-area, do-compile, init-fx-tasks">
+		<delete file="dist"/>
+		<delete file="deploy" />
+	
+		<mkdir dir="dist" />
+		<mkdir dir="dist/libs" />
+	
+		<copy todir="dist/libs">
+			<fileset dir="externalLibs">
+				<include name="*" />
+			</fileset>
+		</copy>
+	
+	
+		<fx:resources id="appRes">
+			<fx:fileset dir="dist" includes="JavaFXSpringBootApp.jar"/>
+			<fx:fileset dir="dist" includes="libs/*"/>
+			<fx:fileset dir="dist" includes="resources/**"/>
+			<fx:fileset dir="dist" includes="reports/**"/>
+			<fx:fileset dir="dist" includes="other/**"/>
+		</fx:resources>
+	
+		<fx:application id="fxApplication"
+			name="Bank"
+			mainClass="com.codetreatise.Main"
+			version="1.0"
+		/>
+	
+		<mkdir dir="build/classes/META-INF" />
+	
+	
+	
+		<fx:jar destfile="dist/JavaFXSpringBootApp.jar">
+			<fx:application refid="fxApplication"/>
+			<fileset dir="build/classes">
+			</fileset>
+			<fx:resources refid="appRes"/>
+	
+			<manifest>
+				<attribute name="Implementation-Vendor" value="brillant-soft"/>
+				<attribute name="Implementation-Title" value="Bank"/>
+				<attribute name="Implementation-Version" value="1.0"/>
+				<attribute name="JavaFX-Feature-Proxy" value="None"/>
+			</manifest>
+		</fx:jar>
+	
+	
+		<mkdir dir="deploy" />
+		<!-- Need to use ${basedir} because somehow the ant task is calculating the directory differently -->
+		<fx:deploy
+			embedJNLP="false"
+			extension="false"
+			includeDT="false"
+			offlineAllowed="true"
+			outdir="${basedir}/deploy"
+			outfile="JavaFXSpringBootApp" nativeBundles="exe"
+			updatemode="background" >
+	
+			<fx:platform basedir="${java.home}"/>
+			<fx:info title="JavaFXSpringBootApp" vendor="brillant-soft"/>
+	
+			<fx:application refId="fxApplication"/>
+			<fx:resources refid="appRes"/>
+		</fx:deploy>
+	
+	
+	</target>
+</project>

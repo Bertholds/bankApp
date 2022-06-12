@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="553.0" prefWidth="655.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.ReportCompteEpargneController">
+   <children>
+      <BarChart fx:id="barChart" layoutX="10.0" layoutY="9.0" prefHeight="524.0" prefWidth="633.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="9.0">
+        <xAxis>
+          <CategoryAxis side="BOTTOM" fx:id="xAxe" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxe" side="LEFT" />
+        </yAxis>
+      </BarChart>
+   </children>
+</AnchorPane>

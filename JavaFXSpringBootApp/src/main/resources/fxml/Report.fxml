@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="553.0" prefWidth="655.0" styleClass="background-color" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codetreatise.controller.ReportController">
+   <children>
+      <DatePicker fx:id="soldeAu" layoutX="33.0" layoutY="229.0" prefHeight="48.0" prefWidth="174.0" promptText="yyyy-MM-dd" />
+      <DatePicker fx:id="report" layoutX="222.0" layoutY="229.0" prefHeight="48.0" prefWidth="174.0" promptText="yyyy-MM-dd" />
+      <Button fx:id="btnGenerate" layoutX="427.0" layoutY="229.0" mnemonicParsing="false" onAction="#handleGenerateClick" prefHeight="48.0" prefWidth="192.0" style="-fx-border-color: yellow; -fx-font-size: 18;" text="Générer le rapport" />
+      <Label layoutX="54.0" layoutY="33.0" style="-fx-text-fill: yellow; -fx-font-weight: bold; -fx-font-size: 75;" text="Rapport Factory" />
+      <Label layoutX="34.0" layoutY="205.0" prefHeight="21.0" prefWidth="174.0" text="DATE DU SOLDE INITIAL" />
+      <Label layoutX="222.0" layoutY="205.0" prefHeight="21.0" prefWidth="174.0" text="DATE DU REPORT" />
+      <Button fx:id="btnPrint" graphicTextGap="8.0" layoutX="173.0" layoutY="376.0" mnemonicParsing="false" onAction="#handleBtnPrintClick" prefHeight="117.0" prefWidth="331.0" style="-fx-background-color: green; -fx-font-size: 50;" text="Imprimer">
+         <graphic>
+            <FontAwesomeIconView glyphName="FILE_PDF_ALT" size="50" />
+         </graphic>
+      </Button>
+   </children>
+</AnchorPane>

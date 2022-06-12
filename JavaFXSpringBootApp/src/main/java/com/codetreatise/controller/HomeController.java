@@ -426,7 +426,7 @@ public class HomeController implements Initializable {
 
 	public void setActifDetail() {
 ////////////Pour les actifs ///////////////////
-		List<CompteEpargne> compteEpargnes = compteEpargneRepository.findAll();    
+		List<CompteEpargne> compteEpargnes = compteEpargneRepository.findAll();        
 
 		Long actifBrute = (long) 0.0;
 		Long actifEmprinte = (long) 0.0;
